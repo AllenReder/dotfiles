@@ -23,7 +23,9 @@ export UV_EXTRA_INDEX_URL="https://mirrors.aliyun.com/pypi/simple/"
 # Micromamba base env PATH (no shell init).
 if command -v micromamba >/dev/null 2>&1; then
   if [ -z "${MAMBA_ROOT_PREFIX:-}" ]; then
-    if [ -d "$HOME/micromamba" ]; then
+    if [ -d "$HOME/.local/share/mamba" ]; then
+      export MAMBA_ROOT_PREFIX="$HOME/.local/share/mamba"
+    elif [ -d "$HOME/micromamba" ]; then
       export MAMBA_ROOT_PREFIX="$HOME/micromamba"
     elif [ -d "$HOME/.micromamba" ]; then
       export MAMBA_ROOT_PREFIX="$HOME/.micromamba"
