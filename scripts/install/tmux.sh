@@ -2,29 +2,30 @@
 # File: tmux.sh - Install oh-my-tmux.
 set -euo pipefail
 
-log() { printf "[dotfiles] %s\n" "$*"; }
-warn() { printf "[dotfiles] WARN: %s\n" "$*" >&2; }
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/i18n.sh"
+dotfiles_lang_init
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 install_oh_my_tmux() {
   if [ -d "$HOME/.tmux" ]; then
-    log "oh-my-tmux already installed"
+    log_msg tmux_installed
   else
     if ! have_cmd git; then
-      warn "git required to install oh-my-tmux"
+      warn_msg tmux_need_git
       return
     fi
-    log "Installing oh-my-tmux"
+    log_msg tmux_install
     git clone https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
   fi
 
   if [ -e "$HOME/.tmux/.tmux.conf" ]; then
     if [ ! -e "$HOME/.tmux.conf" ]; then
       ln -s "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
-      log "Linked ~/.tmux.conf -> ~/.tmux/.tmux.conf"
+      log_msg tmux_linked
     else
-      warn "~/.tmux.conf exists; not overwriting"
+      warn_msg tmux_conf_exists
     fi
   fi
 }

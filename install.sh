@@ -3,14 +3,13 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-log() { printf "[dotfiles] %s\n" "$*"; }
+source "$DOTFILES_DIR/scripts/lib/i18n.sh"
 
 prompt_install_micromamba() {
   if command -v micromamba >/dev/null 2>&1; then
     return
   fi
-  printf "[dotfiles] Micromamba not found. Install micromamba (user-level)? [y/N] " >&2
+  printf "[dotfiles] %s" "$(t prompt_mm)" >&2
   read -r reply || true
   case "$reply" in
     y|Y)
@@ -18,7 +17,7 @@ prompt_install_micromamba() {
         # Official installer puts micromamba in ~/.local/bin
         bash -c "$(curl -fsSL https://micromamba.pfx.dev/install.sh)"
       else
-        printf "[dotfiles] WARN: curl not found; cannot install micromamba\n" >&2
+        warn_msg curl_missing_mm
       fi
       ;;
     *)
@@ -27,18 +26,19 @@ prompt_install_micromamba() {
 }
 
 main() {
-  log "Using dotfiles at $DOTFILES_DIR"
+  dotfiles_lang_init
+  log_msg using_dotfiles "$DOTFILES_DIR"
   prompt_install_micromamba
   "$DOTFILES_DIR/scripts/install/zsh.sh"
   "$DOTFILES_DIR/scripts/install/tmux.sh"
   "$DOTFILES_DIR/scripts/install/tools.sh"
-  log "Linking configs"
+  log_msg linking_configs
   "$DOTFILES_DIR/link.sh"
   if [ -t 1 ] && [ "${DOTFILES_NO_EXEC_ZSH:-}" != "1" ] && [ -z "${ZSH_VERSION:-}" ]; then
-    log "Switching to zsh"
+    log_msg switching_zsh
     exec zsh
   fi
-  log "Done."
+  log_msg done
 }
 
 main "$@"

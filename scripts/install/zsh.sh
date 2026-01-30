@@ -2,38 +2,39 @@
 # File: zsh.sh - Install zsh, oh-my-zsh, powerlevel10k, and related plugins.
 set -euo pipefail
 
-log() { printf "[dotfiles] %s\n" "$*"; }
-warn() { printf "[dotfiles] WARN: %s\n" "$*" >&2; }
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/i18n.sh"
+dotfiles_lang_init
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 install_zsh_user() {
   if have_cmd brew; then
-    log "Installing zsh via Homebrew (user-level)"
+    log_msg install_via_brew "zsh"
     brew install zsh
     return
   fi
 
   if have_cmd nix-env; then
-    log "Installing zsh via nix-env (user-level)"
+    log_msg install_via_nix "zsh"
     nix-env -iA nixpkgs.zsh
     return
   fi
 
   if have_cmd micromamba; then
-    log "Installing zsh via micromamba (user-level)"
+    log_msg install_via_mm "zsh"
     micromamba install -y -c conda-forge zsh
     return
   fi
 
   if have_cmd conda; then
-    log "Installing zsh via conda (user-level)"
+    log_msg install_via_conda "zsh"
     conda install -y -c conda-forge zsh
     return
   fi
 
   if [ "${DOTFILES_ZSH_BUILD:-}" != "1" ]; then
-    warn "No user-level package manager found. Set DOTFILES_ZSH_BUILD=1 to build zsh from source under ~/.local"
+    warn_msg install_manual "zsh (set DOTFILES_ZSH_BUILD=1 to build from source)"
     return
   fi
 
@@ -43,113 +44,113 @@ install_zsh_user() {
   tmp_dir="$(mktemp -d)"
 
   if have_cmd curl; then
-    log "Downloading zsh ${version} via curl"
+    log_msg install_manual "zsh (download via curl)"
     curl -fsSL "$url" -o "$tmp_dir/zsh.tar.xz"
   elif have_cmd wget; then
-    log "Downloading zsh ${version} via wget"
+    log_msg install_manual "zsh (download via wget)"
     wget -qO "$tmp_dir/zsh.tar.xz" "$url"
   else
-    warn "curl or wget required to download zsh source"
+    warn_msg install_manual "zsh (need curl or wget to download source)"
     return
   fi
 
   if ! have_cmd tar; then
-    warn "tar required to extract zsh source"
+    warn_msg install_manual "zsh (need tar to extract source)"
     return
   fi
 
   if ! have_cmd make || ! have_cmd cc; then
-    warn "build tools required (make, cc). Install them or use a user-level package manager"
+    warn_msg install_manual "zsh (need build tools: make, cc)"
     return
   fi
 
-  log "Building zsh ${version} from source"
+  log_msg install_manual "zsh (building from source)"
   tar -xf "$tmp_dir/zsh.tar.xz" -C "$tmp_dir"
   (cd "$tmp_dir/zsh-${version}" && ./configure --prefix="$HOME/.local" && make && make install)
-  log "Installed zsh to $HOME/.local/bin/zsh (ensure ~/.local/bin is on PATH)"
+  log_msg install_manual "zsh installed to ~/.local/bin (ensure PATH)"
 }
 
 install_zsh() {
   if have_cmd zsh; then
-    log "zsh already installed"
+    log_msg zsh_installed
     return
   fi
 
   case "$(uname -s)" in
     Darwin)
       if have_cmd brew; then
-        log "Installing zsh via Homebrew"
+        log_msg zsh_install_brew
         brew install zsh
       else
-        warn "Homebrew not found; install zsh manually (brew install zsh)"
+        warn_msg zsh_brew_missing
       fi
       ;;
     Linux)
       if have_cmd apt-get; then
         if have_cmd sudo; then
-          log "Installing zsh via apt-get (sudo)"
+          log_msg zsh_install_apt_sudo
           sudo apt-get update
           sudo apt-get install -y zsh
         else
           if [ "$(id -u)" = "0" ]; then
-            log "Installing zsh via apt-get (root)"
+            log_msg zsh_install_apt_root
             apt-get update
             apt-get install -y zsh
           else
-            warn "sudo not available; attempting user-level install"
+            warn_msg zsh_no_sudo_user
             install_zsh_user
           fi
         fi
       else
-        warn "apt-get not found; attempting user-level install"
+        warn_msg zsh_no_sudo_user
         install_zsh_user
       fi
       ;;
     *)
-      warn "Unknown OS; install zsh manually"
+      warn_msg zsh_unknown_os
       ;;
   esac
 }
 
 install_oh_my_zsh() {
   if [ -d "$HOME/.oh-my-zsh" ]; then
-    log "oh-my-zsh already installed"
+    log_msg omz_installed
     return
   fi
 
   if have_cmd curl; then
-    log "Installing oh-my-zsh via official script (curl)"
+    log_msg omz_install_curl
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
       sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   elif have_cmd wget; then
-    log "Installing oh-my-zsh via official script (wget)"
+    log_msg omz_install_wget
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
       sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   else
-    warn "curl or wget required to install oh-my-zsh"
+    warn_msg omz_need_curl_wget
   fi
 }
 
 install_oh_my_zsh_plugins() {
   local custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
   if ! have_cmd git; then
-    warn "git required to install oh-my-zsh plugins"
+    warn_msg plugin_need_git
     return
   fi
 
   local autosug_dir="$custom_dir/plugins/zsh-autosuggestions"
   if [ -d "$autosug_dir" ]; then
-    log "zsh-autosuggestions already installed"
+    log_msg autosug_installed
   else
-    log "Installing zsh-autosuggestions"
+    log_msg autosug_install
     git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git "$autosug_dir"
   fi
 
   local syntax_dir="$custom_dir/plugins/zsh-syntax-highlighting"
   if [ -d "$syntax_dir" ]; then
-    log "zsh-syntax-highlighting already installed"
+    log_msg syntax_installed
   else
-    log "Installing zsh-syntax-highlighting"
+    log_msg syntax_install
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$syntax_dir"
   fi
 }
@@ -157,14 +158,14 @@ install_oh_my_zsh_plugins() {
 install_powerlevel10k() {
   local dest="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
   if [ -d "$dest" ]; then
-    log "powerlevel10k already installed"
+    log_msg p10k_installed
     return
   fi
   if ! have_cmd git; then
-    warn "git required to install powerlevel10k"
+    warn_msg p10k_need_git
     return
   fi
-  log "Installing powerlevel10k"
+  log_msg p10k_install
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$dest"
 }
 
@@ -176,26 +177,26 @@ set_default_shell() {
   local zsh_path
   zsh_path="$(command -v zsh || true)"
   if [ -z "$zsh_path" ]; then
-    warn "zsh not found; cannot set default shell"
+    warn_msg set_shell_missing
     return
   fi
 
   if [ "$SHELL" = "$zsh_path" ]; then
-    log "Default shell already set to zsh"
+    log_msg set_shell_already
     return
   fi
 
   if ! have_cmd chsh; then
-    warn "chsh not available; set default shell manually"
+    warn_msg set_shell_no_chsh
     return
   fi
 
   local user="${SUDO_USER:-$USER}"
   if [ "$(id -u)" = "0" ] && [ -n "$user" ]; then
-    log "Setting default shell for $user to $zsh_path"
+    log_msg set_shell_user "$user" "$zsh_path"
     chsh -s "$zsh_path" "$user" || warn "Failed to change shell for $user"
   else
-    log "Setting default shell to $zsh_path"
+    log_msg set_shell "$zsh_path"
     chsh -s "$zsh_path" || warn "Failed to change shell"
   fi
 }
