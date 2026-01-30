@@ -168,11 +168,44 @@ install_powerlevel10k() {
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$dest"
 }
 
+set_default_shell() {
+  if [ -z "${SHELL:-}" ]; then
+    return
+  fi
+
+  local zsh_path
+  zsh_path="$(command -v zsh || true)"
+  if [ -z "$zsh_path" ]; then
+    warn "zsh not found; cannot set default shell"
+    return
+  fi
+
+  if [ "$SHELL" = "$zsh_path" ]; then
+    log "Default shell already set to zsh"
+    return
+  fi
+
+  if ! have_cmd chsh; then
+    warn "chsh not available; set default shell manually"
+    return
+  fi
+
+  local user="${SUDO_USER:-$USER}"
+  if [ "$(id -u)" = "0" ] && [ -n "$user" ]; then
+    log "Setting default shell for $user to $zsh_path"
+    chsh -s "$zsh_path" "$user" || warn "Failed to change shell for $user"
+  else
+    log "Setting default shell to $zsh_path"
+    chsh -s "$zsh_path" || warn "Failed to change shell"
+  fi
+}
+
 main() {
   install_zsh
   install_oh_my_zsh
   install_oh_my_zsh_plugins
   install_powerlevel10k
+  set_default_shell
 }
 
 main "$@"

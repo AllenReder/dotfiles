@@ -12,6 +12,10 @@ main() {
   "$DOTFILES_DIR/scripts/install/tmux.sh"
   log "Linking configs"
   "$DOTFILES_DIR/link.sh"
+  if [ -t 1 ] && [ "${DOTFILES_NO_EXEC_ZSH:-}" != "1" ] && [ -z "${ZSH_VERSION:-}" ]; then
+    log "Switching to zsh"
+    exec zsh
+  fi
   log "Done."
 }
 
