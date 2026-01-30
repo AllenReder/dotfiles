@@ -15,6 +15,7 @@ prompt_install_micromamba() {
     y|Y)
       if command -v curl >/dev/null 2>&1; then
         # Official installer puts micromamba in ~/.local/bin
+        log_msg mm_tip
         bash -c "$(curl -fsSL https://micromamba.pfx.dev/install.sh)"
       else
         warn_msg curl_missing_mm

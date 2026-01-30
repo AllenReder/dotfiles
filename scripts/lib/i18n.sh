@@ -3,10 +3,7 @@
 set -euo pipefail
 
 _dotfiles_lang_default() {
-  case "${LANG:-}" in
-    zh_*|zh.*) echo "zh" ;;
-    *) echo "en" ;;
-  esac
+  echo "zh"
 }
 
 _dotfiles_lang_prompt() {
@@ -38,6 +35,8 @@ _t_fmt() {
     using_dotfiles_zh) echo "使用 dotfiles 目录：%s" ;;
     prompt_mm_en) echo "Micromamba not found. Install micromamba (user-level)? [y/N] " ;;
     prompt_mm_zh) echo "未检测到 micromamba。是否安装（用户级）？[y/N] " ;;
+    mm_tip_en) echo "Micromamba installer tips: press Enter for '~/.local/bin', answer 'n' for 'Init shell (bash)?', press Enter for 'Configure conda-forge?'" ;;
+    mm_tip_zh) echo "Micromamba 安装提示：二进制目录直接回车(~/.local/bin)；Init shell (bash) 选 n；Configure conda-forge 直接回车" ;;
     curl_missing_mm_en) echo "WARN: curl not found; cannot install micromamba" ;;
     curl_missing_mm_zh) echo "WARN: 未找到 curl，无法安装 micromamba" ;;
     linking_configs_en) echo "Linking configs" ;;
