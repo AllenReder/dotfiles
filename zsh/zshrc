@@ -3,7 +3,7 @@
 
 setopt no_beep
 
-DOTFILES_DIR="${0:A:h:h}"
+DOTFILES_DIR="${${(%):-%N}:A:h:h}"
 
 # Load env first (PATH, editor, etc.).
 [ -f "$DOTFILES_DIR/zsh/env.zsh" ] && source "$DOTFILES_DIR/zsh/env.zsh"
