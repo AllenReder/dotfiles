@@ -115,10 +115,44 @@ install_fdfind() {
   install_with_cargo fd-find || warn "Install fd manually"
 }
 
+install_fzf() {
+  if have_cmd fzf; then
+    log "fzf already installed"
+    return
+  fi
+
+  if have_cmd brew; then
+    log "Installing fzf via Homebrew"
+    brew install fzf
+    return
+  fi
+
+  if have_cmd nix-env; then
+    log "Installing fzf via nix-env"
+    nix-env -iA nixpkgs.fzf
+    return
+  fi
+
+  if have_cmd micromamba; then
+    log "Installing fzf via micromamba"
+    micromamba install -y -c conda-forge fzf
+    return
+  fi
+
+  if have_cmd conda; then
+    log "Installing fzf via conda"
+    conda install -y -c conda-forge fzf
+    return
+  fi
+
+  install_with_cargo fzf || warn "Install fzf manually"
+}
+
 main() {
   install_zoxide
   install_eza
   install_fdfind
+  install_fzf
 }
 
 main "$@"

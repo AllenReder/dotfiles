@@ -8,3 +8,6 @@ export LANG="zh_CN.UTF-8"
 if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
+
+# fzf completion trigger.
+export FZF_COMPLETION_TRIGGER=';;'
