@@ -26,9 +26,15 @@ link_file() {
 }
 
 main() {
+  mkdir -p "$HOME/.local/bin"
   link_file "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
   link_file "$DOTFILES_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
   link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf.local"
+
+  for f in "$DOTFILES_DIR"/bin/*; do
+    [ -f "$f" ] || continue
+    link_file "$f" "$HOME/.local/bin/$(basename "$f")"
+  done
 }
 
 main "$@"
