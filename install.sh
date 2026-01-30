@@ -140,6 +140,30 @@ install_powerlevel10k() {
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$dest"
 }
 
+install_oh_my_zsh_plugins() {
+  local custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+  if ! have_cmd git; then
+    warn "git required to install oh-my-zsh plugins"
+    return
+  fi
+
+  local autosug_dir="$custom_dir/plugins/zsh-autosuggestions"
+  if [ -d "$autosug_dir" ]; then
+    log "zsh-autosuggestions already installed"
+  else
+    log "Installing zsh-autosuggestions"
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git "$autosug_dir"
+  fi
+
+  local syntax_dir="$custom_dir/plugins/zsh-syntax-highlighting"
+  if [ -d "$syntax_dir" ]; then
+    log "zsh-syntax-highlighting already installed"
+  else
+    log "Installing zsh-syntax-highlighting"
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$syntax_dir"
+  fi
+}
+
 install_oh_my_tmux() {
   if [ -d "$HOME/.tmux" ]; then
     log "oh-my-tmux already installed"
@@ -166,6 +190,7 @@ main() {
   log "Using dotfiles at $DOTFILES_DIR"
   install_zsh
   install_oh_my_zsh
+  install_oh_my_zsh_plugins
   install_powerlevel10k
   install_oh_my_tmux
   log "Linking configs"
