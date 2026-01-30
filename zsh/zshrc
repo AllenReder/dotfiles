@@ -41,7 +41,7 @@ case "$(uname -s)" in
 # Host-specific tweaks (by hostname substring).
 HOSTNAME_SHORT="$(hostname -s)"
 HOST_MATCH=""
-for f in "$DOTFILES_DIR"/zsh/host/*.zsh; do
+for f in "$DOTFILES_DIR"/zsh/host/*.zsh(N); do
   [ -f "$f" ] || continue
   base="${f:t:r}"
   if [[ "$HOSTNAME_SHORT" == *"$base"* ]]; then

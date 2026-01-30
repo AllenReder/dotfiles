@@ -168,7 +168,9 @@ main() {
   install_oh_my_zsh
   install_powerlevel10k
   install_oh_my_tmux
-  log "Done. Run ./link.sh to link your configs."
+  log "Linking configs"
+  "$DOTFILES_DIR/link.sh"
+  log "Done."
 }
 
 main "$@"
