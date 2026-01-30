@@ -11,3 +11,7 @@ fi
 
 # fzf completion trigger.
 export FZF_COMPLETION_TRIGGER=';;'
+
+# Bark push (fill in your own values).
+export BARK_SERVER=""
+export BARK_DEVICE_KEYS=""
