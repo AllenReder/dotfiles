@@ -15,3 +15,7 @@ export FZF_COMPLETION_TRIGGER=';;'
 # Bark push (fill in your own values).
 export BARK_SERVER=""
 export BARK_DEVICE_KEYS=""
+
+# uv mirrors.
+export UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+export UV_EXTRA_INDEX_URL="https://mirrors.aliyun.com/pypi/simple/"
