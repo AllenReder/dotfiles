@@ -15,6 +15,10 @@ prompt_install_nix() {
   case "$reply" in
     y|Y)
       if command -v curl >/dev/null 2>&1; then
+        if [ "$(id -u)" = "0" ] && [ ! -d /nix ]; then
+          mkdir -m 0755 /nix
+          chown root /nix
+        fi
         sh -c "curl -L https://nixos.org/nix/install | sh"
       else
         printf "[dotfiles] WARN: curl not found; cannot install Nix\n" >&2
