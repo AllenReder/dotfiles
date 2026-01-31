@@ -21,17 +21,19 @@ install_nvitop() {
   fi
 
   if have_cmd apt-get; then
-    if have_cmd sudo; then
-      log_msg install_via_apt "nvitop"
-      sudo apt-get update
-      sudo apt-get install -y nvitop
-      return
-    fi
-    if [ "$(id -u)" = "0" ]; then
-      log_msg install_via_apt "nvitop"
-      apt-get update
-      apt-get install -y nvitop
-      return
+    if apt_has_pkg nvitop; then
+      if have_cmd sudo; then
+        log_msg install_via_apt "nvitop"
+        sudo apt-get update
+        sudo apt-get install -y nvitop
+        return
+      fi
+      if [ "$(id -u)" = "0" ]; then
+        log_msg install_via_apt "nvitop"
+        apt-get update
+        apt-get install -y nvitop
+        return
+      fi
     fi
   fi
 
@@ -44,18 +46,6 @@ install_nvitop() {
   if have_cmd conda; then
     log_msg install_via_conda "nvitop"
     conda install -y -c conda-forge nvitop
-    return
-  fi
-
-  if have_cmd pipx; then
-    log_msg install_via_pipx "nvitop"
-    pipx install nvitop
-    return
-  fi
-
-  if have_cmd pip; then
-    log_msg install_via_pip "nvitop"
-    pip install --user nvitop
     return
   fi
 

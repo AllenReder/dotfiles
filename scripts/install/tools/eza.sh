@@ -21,17 +21,19 @@ install_eza() {
   fi
 
   if have_cmd apt-get; then
-    if have_cmd sudo; then
-      log_msg install_via_apt "eza"
-      sudo apt-get update
-      sudo apt-get install -y eza
-      return
-    fi
-    if [ "$(id -u)" = "0" ]; then
-      log_msg install_via_apt "eza"
-      apt-get update
-      apt-get install -y eza
-      return
+    if apt_has_pkg eza; then
+      if have_cmd sudo; then
+        log_msg install_via_apt "eza"
+        sudo apt-get update
+        sudo apt-get install -y eza
+        return
+      fi
+      if [ "$(id -u)" = "0" ]; then
+        log_msg install_via_apt "eza"
+        apt-get update
+        apt-get install -y eza
+        return
+      fi
     fi
   fi
 
@@ -47,5 +49,5 @@ install_eza() {
     return
   fi
 
-  install_with_cargo eza || warn_msg install_manual "eza"
+  warn_msg install_manual "eza"
 }

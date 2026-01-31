@@ -21,17 +21,19 @@ install_zoxide() {
   fi
 
   if have_cmd apt-get; then
-    if have_cmd sudo; then
-      log_msg install_via_apt "zoxide"
-      sudo apt-get update
-      sudo apt-get install -y zoxide
-      return
-    fi
-    if [ "$(id -u)" = "0" ]; then
-      log_msg install_via_apt "zoxide"
-      apt-get update
-      apt-get install -y zoxide
-      return
+    if apt_has_pkg zoxide; then
+      if have_cmd sudo; then
+        log_msg install_via_apt "zoxide"
+        sudo apt-get update
+        sudo apt-get install -y zoxide
+        return
+      fi
+      if [ "$(id -u)" = "0" ]; then
+        log_msg install_via_apt "zoxide"
+        apt-get update
+        apt-get install -y zoxide
+        return
+      fi
     fi
   fi
 
@@ -47,5 +49,5 @@ install_zoxide() {
     return
   fi
 
-  install_with_cargo zoxide || warn_msg install_manual "zoxide"
+  warn_msg install_manual "zoxide"
 }

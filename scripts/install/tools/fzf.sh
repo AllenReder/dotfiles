@@ -46,6 +46,5 @@ install_fzf() {
     conda install -y -c conda-forge fzf
     return
   fi
-
-  install_with_cargo fzf || warn_msg install_manual "fzf"
+  warn_msg install_manual "fzf"
 }

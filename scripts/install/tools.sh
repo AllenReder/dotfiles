@@ -8,13 +8,11 @@ dotfiles_lang_init
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
-install_with_cargo() {
-  if ! have_cmd cargo; then
-    warn_msg cargo_missing "$1"
+apt_has_pkg() {
+  if ! have_cmd apt-cache; then
     return 1
   fi
-  log_msg install_via_cargo "$1"
-  cargo install "$1"
+  apt-cache show "$1" >/dev/null 2>&1
 }
 
 source "$SCRIPT_DIR/tools/zoxide.sh"

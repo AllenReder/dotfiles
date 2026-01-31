@@ -21,17 +21,19 @@ install_fdfind() {
   fi
 
   if have_cmd apt-get; then
-    if have_cmd sudo; then
-      log_msg install_via_apt "fd"
-      sudo apt-get update
-      sudo apt-get install -y fd-find
-      return
-    fi
-    if [ "$(id -u)" = "0" ]; then
-      log_msg install_via_apt "fd"
-      apt-get update
-      apt-get install -y fd-find
-      return
+    if apt_has_pkg fd-find; then
+      if have_cmd sudo; then
+        log_msg install_via_apt "fd"
+        sudo apt-get update
+        sudo apt-get install -y fd-find
+        return
+      fi
+      if [ "$(id -u)" = "0" ]; then
+        log_msg install_via_apt "fd"
+        apt-get update
+        apt-get install -y fd-find
+        return
+      fi
     fi
   fi
 
@@ -47,5 +49,5 @@ install_fdfind() {
     return
   fi
 
-  install_with_cargo fd-find || warn_msg install_manual "fd"
+  warn_msg install_manual "fd"
 }
