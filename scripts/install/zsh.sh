@@ -191,7 +191,10 @@ set_default_shell() {
     return
   fi
 
-  local user="${SUDO_USER:-$USER}"
+  local user="${SUDO_USER:-}"
+  if [ -z "$user" ]; then
+    user="$(id -un 2>/dev/null || true)"
+  fi
   if [ "$(id -u)" = "0" ] && [ -n "$user" ]; then
     log_msg set_shell_user "$user" "$zsh_path"
     chsh -s "$zsh_path" "$user" || warn "Failed to change shell for $user"

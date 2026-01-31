@@ -27,9 +27,11 @@ link_file() {
 
 main() {
   mkdir -p "$HOME/.local/bin"
+  mkdir -p "$HOME/.config"
   link_file "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
   link_file "$DOTFILES_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
   link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf.local"
+  link_file "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 
   for f in "$DOTFILES_DIR"/bin/*; do
     [ -f "$f" ] || continue
