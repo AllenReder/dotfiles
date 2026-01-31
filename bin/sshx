@@ -1,0 +1,195 @@
+#!/usr/bin/env python3
+# File: sshx - Select an SSH host from ~/.ssh/config (with Include support).
+# Usage: sshx [ssh args...]
+#        sshx --list
+#        sshx --preview <host>
+
+from __future__ import annotations
+
+import os
+import sys
+import glob
+import shlex
+import subprocess
+from typing import Iterable, List, Set
+
+
+def _strip_comment(line: str) -> str:
+    in_single = False
+    in_double = False
+    out = []
+    for ch in line:
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+        if ch == "#" and not in_single and not in_double:
+            break
+        out.append(ch)
+    return "".join(out).strip()
+
+
+def _expand_paths(base_dir: str, patterns: Iterable[str]) -> List[str]:
+    paths: List[str] = []
+    for pat in patterns:
+        pat = os.path.expanduser(pat)
+        if not os.path.isabs(pat):
+            pat = os.path.join(base_dir, pat)
+        matches = glob.glob(pat)
+        if matches:
+            paths.extend(matches)
+    return paths
+
+
+def _parse_config(path: str, visited: Set[str], include_patterns: bool) -> List[str]:
+    hosts: List[str] = []
+    real = os.path.realpath(path)
+    if real in visited:
+        return hosts
+    visited.add(real)
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+    except OSError:
+        return hosts
+
+    base_dir = os.path.dirname(path)
+    for raw in lines:
+        line = _strip_comment(raw)
+        if not line:
+            continue
+        parts = shlex.split(line, posix=True)
+        if not parts:
+            continue
+        key = parts[0].lower()
+        if key == "include" and len(parts) > 1:
+            for inc in _expand_paths(base_dir, parts[1:]):
+                hosts.extend(_parse_config(inc, visited, include_patterns))
+        elif key == "host" and len(parts) > 1:
+            for host in parts[1:]:
+                if not include_patterns:
+                    if any(ch in host for ch in "*?!"):
+                        continue
+                hosts.append(host)
+    return hosts
+
+
+def list_hosts(include_patterns: bool) -> List[str]:
+    config = os.environ.get("SSH_CONFIG", os.path.expanduser("~/.ssh/config"))
+    hosts = _parse_config(config, set(), include_patterns)
+    # Deduplicate while preserving order.
+    seen: Set[str] = set()
+    uniq: List[str] = []
+    for h in hosts:
+        if h not in seen:
+            seen.add(h)
+            uniq.append(h)
+    return uniq
+
+
+def has_cmd(cmd: str) -> bool:
+    return subprocess.call(["/bin/sh", "-c", f"command -v {shlex.quote(cmd)} >/dev/null 2>&1"]) == 0
+
+
+def preview(host: str) -> int:
+    try:
+        proc = subprocess.run([
+            "ssh",
+            "-G",
+            host,
+        ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    except Exception as exc:  # noqa: BLE001
+        sys.stderr.write(f"ssh -G failed: {exc}\n")
+        return 1
+
+    wanted = {
+        "hostname",
+        "user",
+        "port",
+        "identityfile",
+        "proxyjump",
+        "proxycommand",
+        "forwardagent",
+        "localforward",
+        "remoteforward",
+        "dynamicforward",
+        "serveraliveinterval",
+        "serveralivecountmax",
+        "controlpath",
+        "controlmaster",
+        "controlpersist",
+    }
+
+    for line in proc.stdout.splitlines():
+        key = line.split(" ", 1)[0].strip()
+        if key in wanted:
+            sys.stdout.write(line + "\n")
+    return 0
+
+
+def select_host(hosts: List[str]) -> str:
+    if not hosts:
+        return ""
+
+    if has_cmd("fzf"):
+        preview_cmd = [sys.executable, os.path.realpath(__file__), "--preview", "{}"]
+        fzf_cmd = [
+            "fzf",
+            "--prompt=ssh> ",
+            "--ansi",
+            "--preview",
+            " ".join(shlex.quote(x) for x in preview_cmd),
+            "--preview-window=right:60%:wrap",
+        ]
+        proc = subprocess.run(fzf_cmd, input="\n".join(hosts) + "\n", text=True, stdout=subprocess.PIPE)
+        return proc.stdout.strip()
+
+    # Fallback: numbered list.
+    for i, host in enumerate(hosts, 1):
+        sys.stdout.write(f"{i:>3}. {host}\n")
+    sys.stdout.write("Select host number: ")
+    sys.stdout.flush()
+    try:
+        sel = input().strip()
+    except EOFError:
+        return ""
+    if not sel.isdigit():
+        return ""
+    idx = int(sel)
+    if idx < 1 or idx > len(hosts):
+        return ""
+    return hosts[idx - 1]
+
+
+def main() -> int:
+    argv = sys.argv[1:]
+
+    if argv[:1] == ["--preview"]:
+        if len(argv) < 2:
+            sys.stderr.write("Usage: sshx --preview <host>\n")
+            return 2
+        return preview(argv[1])
+
+    include_patterns = False
+    if "--include-patterns" in argv:
+        include_patterns = True
+        argv.remove("--include-patterns")
+
+    if argv[:1] == ["--list"]:
+        for h in list_hosts(include_patterns):
+            sys.stdout.write(h + "\n")
+        return 0
+
+    hosts = list_hosts(include_patterns)
+    host = select_host(hosts)
+    if not host:
+        return 1
+
+    # Exec ssh with remaining args.
+    os.execvp("ssh", ["ssh", host] + argv)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
