@@ -48,7 +48,7 @@ ensure_basic_tools() {
   esac
 }
 
-prompt_install_brew_or_micromamba() {
+prompt_install_pkg_manager() {
   case "$(uname -s)" in
     Darwin)
       if command -v brew >/dev/null 2>&1; then
@@ -69,13 +69,13 @@ prompt_install_brew_or_micromamba() {
       esac
       ;;
     Linux)
-      if command -v micromamba >/dev/null 2>&1; then
+      if command -v micromamba >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1; then
         return
       fi
-      printf "[dotfiles] %s" "$(t prompt_mm)" >&2
+      printf "[dotfiles] %s" "$(t prompt_pm)" >&2
       read -r reply || true
       case "$reply" in
-        y|Y)
+        ""|1|m|M)
           if command -v curl >/dev/null 2>&1; then
             # Official installer puts micromamba in ~/.local/bin
             log_msg mm_tip
@@ -86,6 +86,18 @@ prompt_install_brew_or_micromamba() {
             fi
           else
             warn_msg curl_missing_mm
+          fi
+          ;;
+        2|c|C)
+          if command -v curl >/dev/null 2>&1; then
+            log_msg install_via_rustup
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            if [ -d "$HOME/.cargo/bin" ]; then
+              PATH="$HOME/.cargo/bin:$PATH"
+              export PATH
+            fi
+          else
+            warn_msg curl_missing_rustup
           fi
           ;;
         *)
@@ -101,7 +113,7 @@ main() {
   dotfiles_lang_init
   log_msg using_dotfiles "$DOTFILES_DIR"
   ensure_basic_tools
-  prompt_install_brew_or_micromamba
+  prompt_install_pkg_manager
   "$DOTFILES_DIR/scripts/install/zsh.sh"
   "$DOTFILES_DIR/scripts/install/tmux.sh"
   "$DOTFILES_DIR/scripts/install/tools.sh"

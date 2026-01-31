@@ -33,8 +33,8 @@ _t_fmt() {
   case "$1" in
     using_dotfiles_en) echo "Using dotfiles at %s" ;;
     using_dotfiles_zh) echo "使用 dotfiles 目录：%s" ;;
-    prompt_mm_en) echo "Micromamba not found. Install micromamba (user-level)? [y/N] " ;;
-    prompt_mm_zh) echo "未检测到 micromamba。是否安装（用户级）？[y/N] " ;;
+    prompt_pm_en) echo "No package manager found. Install: 1) micromamba 2) cargo [default: 1]: " ;;
+    prompt_pm_zh) echo "未检测到包管理工具。请选择安装：1) micromamba 2) cargo [默认: 1]: " ;;
     prompt_brew_en) echo "Homebrew not found. Install Homebrew? [y/N] " ;;
     prompt_brew_zh) echo "未检测到 Homebrew。是否安装 Homebrew？[y/N] " ;;
     curl_missing_brew_en) echo "WARN: curl not found; cannot install Homebrew" ;;
@@ -43,6 +43,8 @@ _t_fmt() {
     mm_tip_zh) echo "Micromamba 安装提示：二进制目录直接回车(~/.local/bin)；Init shell (bash) 选 n；Configure conda-forge 直接回车" ;;
     curl_missing_mm_en) echo "WARN: curl not found; cannot install micromamba" ;;
     curl_missing_mm_zh) echo "WARN: 未找到 curl，无法安装 micromamba" ;;
+    curl_missing_rustup_en) echo "WARN: curl not found; cannot install rustup/cargo" ;;
+    curl_missing_rustup_zh) echo "WARN: 未找到 curl，无法安装 rustup/cargo" ;;
     linking_configs_en) echo "Linking configs" ;;
     linking_configs_zh) echo "正在链接配置" ;;
     switching_zsh_en) echo "Switching to zsh" ;;
@@ -122,6 +124,8 @@ _t_fmt() {
     install_via_nix_zh) echo "通过 nix-env 安装 %s" ;;
     install_via_mm_en) echo "Installing %s via micromamba" ;;
     install_via_mm_zh) echo "通过 micromamba 安装 %s" ;;
+    install_via_rustup_en) echo "Installing cargo via rustup" ;;
+    install_via_rustup_zh) echo "通过 rustup 安装 cargo" ;;
     install_via_conda_en) echo "Installing %s via conda" ;;
     install_via_conda_zh) echo "通过 conda 安装 %s" ;;
     install_via_pipx_en) echo "Installing %s via pipx" ;;
