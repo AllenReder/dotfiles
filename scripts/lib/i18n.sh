@@ -124,6 +124,10 @@ _t_fmt() {
     install_via_mm_zh) echo "通过 micromamba 安装 %s" ;;
     install_via_conda_en) echo "Installing %s via conda" ;;
     install_via_conda_zh) echo "通过 conda 安装 %s" ;;
+    install_via_pipx_en) echo "Installing %s via pipx" ;;
+    install_via_pipx_zh) echo "通过 pipx 安装 %s" ;;
+    install_via_pip_en) echo "Installing %s via pip" ;;
+    install_via_pip_zh) echo "通过 pip 安装 %s" ;;
     install_via_cargo_en) echo "Installing %s via cargo" ;;
     install_via_cargo_zh) echo "通过 cargo 安装 %s" ;;
     cargo_missing_en) echo "cargo not found; cannot install %s via cargo" ;;

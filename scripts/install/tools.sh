@@ -149,11 +149,57 @@ install_fzf() {
   install_with_cargo fzf || warn_msg install_manual "fzf"
 }
 
+install_nvitop() {
+  if have_cmd nvitop; then
+    log_msg already_installed "nvitop"
+    return
+  fi
+
+  if have_cmd brew; then
+    log_msg install_via_brew "nvitop"
+    brew install nvitop
+    return
+  fi
+
+  if have_cmd nix-env; then
+    log_msg install_via_nix "nvitop"
+    nix-env -iA nixpkgs.nvitop
+    return
+  fi
+
+  if have_cmd micromamba; then
+    log_msg install_via_mm "nvitop"
+    micromamba install -y -c conda-forge nvitop
+    return
+  fi
+
+  if have_cmd conda; then
+    log_msg install_via_conda "nvitop"
+    conda install -y -c conda-forge nvitop
+    return
+  fi
+
+  if have_cmd pipx; then
+    log_msg install_via_pipx "nvitop"
+    pipx install nvitop
+    return
+  fi
+
+  if have_cmd pip; then
+    log_msg install_via_pip "nvitop"
+    pip install --user nvitop
+    return
+  fi
+
+  warn_msg install_manual "nvitop"
+}
+
 main() {
   install_zoxide
   install_eza
   install_fdfind
   install_fzf
+  install_nvitop
 }
 
 main "$@"
