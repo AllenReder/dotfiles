@@ -35,6 +35,21 @@ install_zoxide() {
     return
   fi
 
+  if have_cmd apt-get; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "zoxide"
+      sudo apt-get update
+      sudo apt-get install -y zoxide
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "zoxide"
+      apt-get update
+      apt-get install -y zoxide
+      return
+    fi
+  fi
+
   if have_cmd micromamba; then
     log_msg install_via_mm "zoxide"
     micromamba install -y -c conda-forge zoxide
@@ -66,6 +81,21 @@ install_eza() {
     log_msg install_via_nix "eza"
     nix-env -iA nixpkgs.eza
     return
+  fi
+
+  if have_cmd apt-get; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "eza"
+      sudo apt-get update
+      sudo apt-get install -y eza
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "eza"
+      apt-get update
+      apt-get install -y eza
+      return
+    fi
   fi
 
   if have_cmd micromamba; then
@@ -101,6 +131,21 @@ install_fdfind() {
     return
   fi
 
+  if have_cmd apt-get; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "fd"
+      sudo apt-get update
+      sudo apt-get install -y fd-find
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "fd"
+      apt-get update
+      apt-get install -y fd-find
+      return
+    fi
+  fi
+
   if have_cmd micromamba; then
     log_msg install_via_mm "fd"
     micromamba install -y -c conda-forge fd-find
@@ -132,6 +177,21 @@ install_fzf() {
     log_msg install_via_nix "fzf"
     nix-env -iA nixpkgs.fzf
     return
+  fi
+
+  if have_cmd apt-get; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "fzf"
+      sudo apt-get update
+      sudo apt-get install -y fzf
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "fzf"
+      apt-get update
+      apt-get install -y fzf
+      return
+    fi
   fi
 
   if have_cmd micromamba; then
@@ -167,18 +227,6 @@ install_bat() {
     return
   fi
 
-  if have_cmd micromamba; then
-    log_msg install_via_mm "bat"
-    micromamba install -y -c conda-forge bat
-    return
-  fi
-
-  if have_cmd conda; then
-    log_msg install_via_conda "bat"
-    conda install -y -c conda-forge bat
-    return
-  fi
-
   if have_cmd apt-get; then
     if have_cmd sudo; then
       log_msg install_via_apt "bat"
@@ -192,6 +240,18 @@ install_bat() {
       apt-get install -y bat
       return
     fi
+  fi
+
+  if have_cmd micromamba; then
+    log_msg install_via_mm "bat"
+    micromamba install -y -c conda-forge bat
+    return
+  fi
+
+  if have_cmd conda; then
+    log_msg install_via_conda "bat"
+    conda install -y -c conda-forge bat
+    return
   fi
 
   install_with_cargo bat || warn_msg install_manual "bat"
@@ -213,6 +273,21 @@ install_nvitop() {
     log_msg install_via_nix "nvitop"
     nix-env -iA nixpkgs.nvitop
     return
+  fi
+
+  if have_cmd apt-get; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "nvitop"
+      sudo apt-get update
+      sudo apt-get install -y nvitop
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "nvitop"
+      apt-get update
+      apt-get install -y nvitop
+      return
+    fi
   fi
 
   if have_cmd micromamba; then
