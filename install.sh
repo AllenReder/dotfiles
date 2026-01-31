@@ -69,7 +69,7 @@ prompt_install_pkg_manager() {
       esac
       ;;
     Linux)
-      if command -v micromamba >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1; then
+      if command -v micromamba >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1 || command -v nix-env >/dev/null 2>&1; then
         return
       fi
       printf "[dotfiles] %s" "$(t prompt_pm)" >&2
@@ -99,6 +99,20 @@ prompt_install_pkg_manager() {
           else
             warn_msg curl_missing_rustup
           fi
+          ;;
+        3|n|N)
+          if command -v curl >/dev/null 2>&1; then
+            log_msg install_via_nix
+            sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon
+            if [ -d "$HOME/.nix-profile/bin" ]; then
+              PATH="$HOME/.nix-profile/bin:$PATH"
+              export PATH
+            fi
+          else
+            warn_msg curl_missing_nix
+          fi
+          ;;
+        4|none|None|NONE)
           ;;
         *)
           ;;
