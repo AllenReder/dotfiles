@@ -14,12 +14,6 @@ install_bat() {
     return
   fi
 
-  if have_cmd nix-env; then
-    log_msg install_via_nix "bat"
-    nix-env -iA nixpkgs.bat
-    return
-  fi
-
   if have_cmd apt-get; then
     if apt_has_pkg bat; then
       if have_cmd sudo; then
@@ -35,6 +29,12 @@ install_bat() {
         return
       fi
     fi
+  fi
+
+  if have_cmd nix-env; then
+    log_msg install_via_nix "bat"
+    nix-env -iA nixpkgs.bat
+    return
   fi
 
   if have_cmd micromamba; then

@@ -14,12 +14,6 @@ install_fdfind() {
     return
   fi
 
-  if have_cmd nix-env; then
-    log_msg install_via_nix "fd"
-    nix-env -iA nixpkgs.fd
-    return
-  fi
-
   if have_cmd apt-get; then
     if apt_has_pkg fd-find; then
       if have_cmd sudo; then
@@ -35,6 +29,12 @@ install_fdfind() {
         return
       fi
     fi
+  fi
+
+  if have_cmd nix-env; then
+    log_msg install_via_nix "fd"
+    nix-env -iA nixpkgs.fd
+    return
   fi
 
   if have_cmd micromamba; then

@@ -14,12 +14,6 @@ install_zoxide() {
     return
   fi
 
-  if have_cmd nix-env; then
-    log_msg install_via_nix "zoxide"
-    nix-env -iA nixpkgs.zoxide
-    return
-  fi
-
   if have_cmd apt-get; then
     if apt_has_pkg zoxide; then
       if have_cmd sudo; then
@@ -35,6 +29,12 @@ install_zoxide() {
         return
       fi
     fi
+  fi
+
+  if have_cmd nix-env; then
+    log_msg install_via_nix "zoxide"
+    nix-env -iA nixpkgs.zoxide
+    return
   fi
 
   if have_cmd micromamba; then

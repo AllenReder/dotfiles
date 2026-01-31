@@ -14,12 +14,6 @@ install_fzf() {
     return
   fi
 
-  if have_cmd nix-env; then
-    log_msg install_via_nix "fzf"
-    nix-env -iA nixpkgs.fzf
-    return
-  fi
-
   if have_cmd apt-get; then
     if have_cmd sudo; then
       log_msg install_via_apt "fzf"
@@ -33,6 +27,12 @@ install_fzf() {
       apt-get install -y fzf
       return
     fi
+  fi
+
+  if have_cmd nix-env; then
+    log_msg install_via_nix "fzf"
+    nix-env -iA nixpkgs.fzf
+    return
   fi
 
   if have_cmd micromamba; then
