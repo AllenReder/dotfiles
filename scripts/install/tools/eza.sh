@@ -14,6 +14,19 @@ install_eza() {
     return
   fi
 
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "eza"
+      sudo pacman -S --needed --noconfirm eza
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "eza"
+      pacman -S --needed --noconfirm eza
+      return
+    fi
+  fi
+
   if have_cmd apt-get; then
     if apt_has_pkg eza; then
       if have_cmd sudo; then

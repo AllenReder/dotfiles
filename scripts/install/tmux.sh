@@ -45,6 +45,19 @@ install_tmux() {
     return
   fi
 
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "tmux"
+      sudo pacman -S --needed --noconfirm tmux
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "tmux"
+      pacman -S --needed --noconfirm tmux
+      return
+    fi
+  fi
+
   if have_cmd apt-get; then
     if have_cmd sudo; then
       log_msg install_via_apt "tmux"

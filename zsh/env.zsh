@@ -1,7 +1,7 @@
 # File: env.zsh - Environment variables shared across shells.
 # Environment defaults.
 DOTFILES_DIR="${${(%):-%N}:A:h:h}"
-export PATH="$DOTFILES_DIR/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/omarchy/bin:$DOTFILES_DIR/bin:$HOME/.local/bin:$PATH"
 export EDITOR="nvim"
 export LANG="zh_CN.UTF-8"
 

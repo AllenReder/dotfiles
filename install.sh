@@ -8,6 +8,7 @@ source "$DOTFILES_DIR/scripts/lib/i18n.sh"
 log_plain() { printf "[dotfiles] %s\n" "$*"; }
 warn_plain() { printf "[dotfiles] %s\n" "$*" >&2; }
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
+is_arch() { have_cmd pacman; }
 
 ensure_basic_tools() {
   case "$(uname -s)" in
@@ -19,6 +20,18 @@ ensure_basic_tools() {
         fi
       done
       if [ "${#missing[@]}" -eq 0 ]; then
+        return
+      fi
+
+      if is_arch; then
+        log_plain "缺少基础工具: ${missing[*]}"
+        if have_cmd sudo; then
+          sudo pacman -S --needed --noconfirm "${missing[@]}" || warn_plain "安装基础工具失败"
+        elif [ "$(id -u)" = "0" ]; then
+          pacman -S --needed --noconfirm "${missing[@]}" || warn_plain "安装基础工具失败"
+        else
+          warn_plain "缺少 sudo 且不是 root，无法自动安装基础工具"
+        fi
         return
       fi
 
@@ -69,6 +82,9 @@ prompt_install_pkg_manager() {
       esac
       ;;
     Linux)
+      if is_arch; then
+        return
+      fi
       if command -v micromamba >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1 || command -v nix-env >/dev/null 2>&1; then
         return
       fi
@@ -128,13 +144,21 @@ main() {
   log_msg using_dotfiles "$DOTFILES_DIR"
   ensure_basic_tools
   prompt_install_pkg_manager
-  "$DOTFILES_DIR/scripts/install/zsh.sh"
+  if is_arch; then
+    DOTFILES_SET_DEFAULT_SHELL=0 "$DOTFILES_DIR/scripts/install/zsh.sh"
+  else
+    "$DOTFILES_DIR/scripts/install/zsh.sh"
+  fi
   "$DOTFILES_DIR/scripts/install/tmux.sh"
   "$DOTFILES_DIR/scripts/install/tools.sh"
   bash "$DOTFILES_DIR/scripts/install/nvim.sh"
-  log_msg linking_configs
-  "$DOTFILES_DIR/link.sh"
-  if [ -t 1 ] && [ "${DOTFILES_NO_EXEC_ZSH:-}" != "1" ] && [ -z "${ZSH_VERSION:-}" ]; then
+  if [ "${DOTFILES_LINK:-1}" = "1" ]; then
+    log_msg linking_configs
+    "$DOTFILES_DIR/link.sh"
+  else
+    log_plain "跳过自动链接（设置 DOTFILES_LINK=1 可启用）"
+  fi
+  if [ -t 1 ] && [ "${DOTFILES_NO_EXEC_ZSH:-}" != "1" ] && [ "${DOTFILES_SET_DEFAULT_SHELL:-0}" = "1" ] && [ -z "${ZSH_VERSION:-}" ]; then
     log_msg switching_zsh
     exec zsh
   fi

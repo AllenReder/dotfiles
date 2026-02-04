@@ -14,6 +14,25 @@ install_nvitop() {
     return
   fi
 
+  if have_cmd yay; then
+    log_msg install_via_aur "nvitop"
+    yay -S --needed --noconfirm nvitop
+    return
+  fi
+
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "nvitop"
+      sudo pacman -S --needed --noconfirm nvitop
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "nvitop"
+      pacman -S --needed --noconfirm nvitop
+      return
+    fi
+  fi
+
   if have_cmd apt-get; then
     if apt_has_pkg nvitop; then
       if have_cmd sudo; then

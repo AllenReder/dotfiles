@@ -14,6 +14,19 @@ install_fdfind() {
     return
   fi
 
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "fd"
+      sudo pacman -S --needed --noconfirm fd
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "fd"
+      pacman -S --needed --noconfirm fd
+      return
+    fi
+  fi
+
   if have_cmd apt-get; then
     if apt_has_pkg fd-find; then
       if have_cmd sudo; then

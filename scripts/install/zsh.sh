@@ -86,6 +86,19 @@ install_zsh() {
       fi
       ;;
     Linux)
+      if have_cmd pacman; then
+        if have_cmd sudo; then
+          log_msg zsh_install_apt_sudo
+          sudo pacman -S --needed --noconfirm zsh
+        elif [ "$(id -u)" = "0" ]; then
+          log_msg zsh_install_apt_root
+          pacman -S --needed --noconfirm zsh
+        else
+          warn_msg zsh_no_sudo_user
+          install_zsh_user
+        fi
+        return
+      fi
       if have_cmd apt-get; then
         if have_cmd sudo; then
           log_msg zsh_install_apt_sudo
@@ -209,7 +222,9 @@ main() {
   install_oh_my_zsh
   install_oh_my_zsh_plugins
   install_powerlevel10k
-  set_default_shell
+  if [ "${DOTFILES_SET_DEFAULT_SHELL:-1}" = "1" ]; then
+    set_default_shell
+  fi
 }
 
 main "$@"

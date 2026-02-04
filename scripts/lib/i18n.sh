@@ -122,6 +122,8 @@ _t_fmt() {
     already_installed_zh) echo "%s 已安装" ;;
     install_via_brew_en) echo "Installing %s via Homebrew" ;;
     install_via_brew_zh) echo "通过 Homebrew 安装 %s" ;;
+    install_via_aur_en) echo "Installing %s via AUR (yay)" ;;
+    install_via_aur_zh) echo "通过 AUR (yay) 安装 %s" ;;
     install_via_nix_en) echo "Installing %s via nix-env" ;;
     install_via_nix_zh) echo "通过 nix-env 安装 %s" ;;
     install_via_mm_en) echo "Installing %s via micromamba" ;;

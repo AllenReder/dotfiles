@@ -14,6 +14,19 @@ install_zoxide() {
     return
   fi
 
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log_msg install_via_apt "zoxide"
+      sudo pacman -S --needed --noconfirm zoxide
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log_msg install_via_apt "zoxide"
+      pacman -S --needed --noconfirm zoxide
+      return
+    fi
+  fi
+
   if have_cmd apt-get; then
     if apt_has_pkg zoxide; then
       if have_cmd sudo; then

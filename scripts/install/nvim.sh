@@ -22,6 +22,19 @@ install_nvim_linux() {
     return
   fi
 
+  if have_cmd pacman; then
+    if have_cmd sudo; then
+      log "Installing Neovim via pacman"
+      sudo pacman -S --needed --noconfirm neovim
+      return
+    fi
+    if [ "$(id -u)" = "0" ]; then
+      log "Installing Neovim via pacman"
+      pacman -S --needed --noconfirm neovim
+      return
+    fi
+  fi
+
   local version="${NVIM_VERSION:-0.11.5}"
   local arch
   arch="$(uname -m)"
