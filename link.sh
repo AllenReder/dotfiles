@@ -37,6 +37,8 @@ main() {
   link_file "$DOTFILES_DIR/hypr" "$HOME/.config/hypr"
   link_file "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
   link_file "$DOTFILES_DIR/swayosd" "$HOME/.config/swayosd"
+  link_file "$DOTFILES_DIR/omarchy" "$HOME/.config/omarchy"
+  link_file "$DOTFILES_DIR/walker" "$HOME/.config/walker"
 
   for f in "$DOTFILES_DIR"/bin/*; do
     [ -f "$f" ] || continue
