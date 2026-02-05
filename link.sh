@@ -32,6 +32,11 @@ main() {
   link_file "$DOTFILES_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
   link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf.local"
   link_file "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+  link_file "$DOTFILES_DIR/waybar" "$HOME/.config/waybar"
+  link_file "$DOTFILES_DIR/ironbar" "$HOME/.config/ironbar"
+  link_file "$DOTFILES_DIR/hypr" "$HOME/.config/hypr"
+  link_file "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
+  link_file "$DOTFILES_DIR/swayosd" "$HOME/.config/swayosd"
 
   for f in "$DOTFILES_DIR"/bin/*; do
     [ -f "$f" ] || continue
