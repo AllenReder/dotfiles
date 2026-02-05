@@ -51,3 +51,11 @@ for f in "$DOTFILES_DIR"/zsh/host/*.zsh(N); do
   fi
 done
 [ -n "$HOST_MATCH" ] && source "$HOST_MATCH"
+
+# clashctl START
+# 加载 clashctl 命令
+. /home/allen/clashctl/scripts/cmd/clashctl.sh
+# 自动开启代理环境
+# watch_proxy
+# clashctl END
+
