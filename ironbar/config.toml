@@ -1,7 +1,7 @@
 # Ironbar config migrated from Waybar
 
 position = "top"
-height = 24
+height = 16
 anchor_to_edges = true
 layer = "top"
 exclusive_zone = true

@@ -33,6 +33,20 @@
   color: @content_main;
 }
 
+/* Force shorter bar height */
+#bar,
+.background,
+.container,
+.widget-container,
+.widget,
+button,
+label,
+image {
+  min-height: 24px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .workspaces {
   color: transparent;
   margin-right: 4px;
@@ -72,6 +86,10 @@
   background: transparent;
   transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
   border-radius: 8px;
+}
+
+.launcher .item label {
+    margin-left: 6px; /* 图标在左边时 */
 }
 
 .launcher .item.focused {
