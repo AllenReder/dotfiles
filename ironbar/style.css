@@ -1,0 +1,155 @@
+/* Ironbar style migrated from Waybar */
+
+/* base background color */
+@define-color bg_main rgba(25, 25, 25, 0.0);
+
+/* base background color of selections */
+@define-color bg_hover rgba(200, 200, 200, 0.3);
+/* base background color of active elements */
+@define-color bg_active rgba(100, 100, 100, 0.5);
+
+/* base border color */
+@define-color border_main rgba(255, 255, 255, 0.2);
+
+/* text color for entries, views and content in general */
+@define-color content_main white;
+/* text color for entries that are unselected */
+@define-color content_inactive rgba(255, 255, 255, 0.25);
+
+@define-color warning_color rgba(255, 200, 0, 0.8);
+
+* {
+  text-shadow: none;
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  font-family: "Segoe UI", "Ubuntu";
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.background {
+  background: @bg_main;
+  color: @content_main;
+}
+
+.workspaces {
+  color: transparent;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.workspaces .item {
+  border-radius: 8px;
+  padding: 0px 4px;
+  color: @content_inactive;
+  background: transparent;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.workspaces .item.focused {
+  color: @content_main;
+  background: @bg_active;
+}
+
+.workspaces .item.urgent {
+  background: rgba(255, 200, 0, 0.35);
+  color: @warning_color;
+}
+
+.workspaces .item:hover {
+  background: @bg_hover;
+  color: @content_main;
+}
+
+.launcher .item {
+  min-width: 100px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: white;
+  background: transparent;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.launcher .item.focused {
+  background: @bg_active;
+  border-radius: 8px;
+}
+
+.launcher .item:hover {
+  background: @bg_hover;
+  color: @content_main;
+}
+
+#cpu,
+#memory {
+  padding: 0px 3px;
+}
+
+#temperature {
+  color: @content_main;
+  margin-left: 2px;
+  margin-right: 2px;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tray {
+  margin-left: 2px;
+  margin-right: 2px;
+  border-radius: 4px;
+}
+
+.tray .item {
+  border-radius: 8px;
+  padding: 0px 4px;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  background: transparent;
+}
+
+.tray .item:hover {
+  background: @bg_hover;
+}
+
+#network {
+  font-family: "JetBrainsMono Nerd Font";
+  padding: 0px 9px 0px 6px;
+  margin-left: 0;
+  margin-right: 0;
+  background-clip: padding-box;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border-radius: 8px;
+}
+
+#network:hover {
+  background: @bg_hover;
+}
+
+#pulseaudio {
+  font-family: "JetBrainsMono Nerd Font";
+  padding: 0px 6px;
+  margin-left: 0;
+  margin-right: 0;
+  background-clip: padding-box;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border-radius: 8px;
+  background: transparent;
+}
+
+#pulseaudio:hover {
+  background: @bg_hover;
+}
+
+#clock {
+  padding-right: 5px;
+  padding-left: 5px;
+  margin-left: 2px;
+  margin-right: 2px;
+  background: transparent;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#clock:hover {
+  background: @bg_hover;
+}

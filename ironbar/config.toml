@@ -1,0 +1,82 @@
+# Ironbar config migrated from Waybar
+
+position = "top"
+height = 24
+anchor_to_edges = true
+layer = "top"
+exclusive_zone = true
+icon_theme = "Adwaita"
+
+# Left / Start
+[[start]]
+type = "workspaces"
+icon_size = 16
+on_scroll_up = "hyprctl dispatch workspace r-1"
+on_scroll_down = "hyprctl dispatch workspace r+1"
+
+[[center]]
+type = "launcher"
+icon_size = 16
+show_names = true
+show_icons = true
+truncate.mode = "end"
+truncate.max_length = 17
+
+# Right / End
+[[end]]
+type = "sys_info"
+name = "cpu"
+format = ["  {cpu_percent}%"]
+[end.interval]
+cpu = 5
+
+# [[end]]
+# type = "sys_info"
+# name = "temperature"
+# format = ["({temp_c}°C)"]
+# [end.interval]
+# temps = 5
+
+[[end]]
+type = "sys_info"
+name = "memory"
+format = ["  {memory_percent}%"]
+[end.interval]
+memory = 10
+
+[[end]]
+type = "tray"
+icon_size = 18
+
+[[end]]
+type = "script"
+name = "network"
+cmd = "/home/allen/dotfiles/ironbar/scripts/network-icon.sh"
+interval = 3000
+on_click_left = "omarchy-launch-wifi"
+
+[[end]]
+type = "volume"
+name = "pulseaudio"
+format = "{icon}"
+max_volume = 150
+on_click_left = "omarchy-launch-audio"
+on_click_right = "pamixer -t"
+on_scroll_up = "pactl set-sink-volume @DEFAULT_SINK@ +5%"
+on_scroll_down = "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+
+[end.icons]
+volume_high = ""
+volume_medium = ""
+volume_low = ""
+muted = ""
+
+
+[end.thresholds]
+warning = 30
+critical = 20
+
+[[end]]
+type = "clock"
+name = "clock"
+format = "%R"
