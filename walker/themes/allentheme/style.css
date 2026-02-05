@@ -1,0 +1,69 @@
+/* allentheme: custom Walker theme (standalone, no Omarchy imports) */
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+  font-size: 16px;
+  color: #e6e6e6;
+}
+
+/* window container */
+.box-wrapper {
+  background: rgba(50, 50, 50, 0.05);
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.search-container {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.input placeholder {
+  opacity: 0.6;
+}
+
+.normal-icons { -gtk-icon-size: 18px; }
+.large-icons  { -gtk-icon-size: 34px; }
+
+.list {
+  margin-top: 10px;
+}
+
+.item-box {
+  border-radius: 10px;
+  padding-left: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.0);
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.item-text-box {
+  padding: 10px 0;
+}
+
+.item-image {
+  margin-right: 12px;
+}
+
+child:selected .item-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+child:selected .item-box * {
+  color: #ffffff;
+}
+
+.item-subtext {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.keybind-hints {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
