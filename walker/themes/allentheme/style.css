@@ -12,12 +12,12 @@
   background: rgba(50, 50, 50, 0.05);
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 24px;
 }
 
 .search-container {
   background: rgba(255, 255, 255, 0.03);
-  padding: 10px 12px;
+  padding: 10px 10px;
   border-radius: 10px;
 }
 
