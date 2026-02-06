@@ -23,8 +23,9 @@
 # color14 = "#8fbcbb"
 # color15 = "#eceff4"
 
-# --- Allentheme (darker background, softer blue) ---
-accent = "#7aa2c7"
+# --- Allentheme ---
+# accent = "#7aa2c7"
+accent = "#7aa2e7"
 cursor = "#d7dce5"
 foreground = "#d7dce5"
 background = "#1c1c1c"

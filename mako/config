@@ -1,0 +1,6 @@
+include=~/.config/omarchy/current/theme/mako.ini
+
+border-size=1
+border-radius=16
+border-color=#ffffff14
+background-color=#3333330d

@@ -36,6 +36,7 @@ main() {
   link_file "$DOTFILES_DIR/ironbar" "$HOME/.config/ironbar"
   link_file "$DOTFILES_DIR/hypr" "$HOME/.config/hypr"
   link_file "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
+  link_file "$DOTFILES_DIR/mako" "$HOME/.config/mako"
   link_file "$DOTFILES_DIR/swayosd" "$HOME/.config/swayosd"
   link_file "$DOTFILES_DIR/omarchy" "$HOME/.config/omarchy"
   link_file "$DOTFILES_DIR/walker" "$HOME/.config/walker"
