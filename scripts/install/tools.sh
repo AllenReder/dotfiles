@@ -18,6 +18,7 @@ apt_has_pkg() {
 source "$SCRIPT_DIR/tools/zoxide.sh"
 source "$SCRIPT_DIR/tools/eza.sh"
 source "$SCRIPT_DIR/tools/fd.sh"
+source "$SCRIPT_DIR/tools/rg.sh"
 source "$SCRIPT_DIR/tools/fzf.sh"
 source "$SCRIPT_DIR/tools/bat.sh"
 source "$SCRIPT_DIR/tools/nvitop.sh"
@@ -26,6 +27,7 @@ main() {
   install_zoxide
   install_eza
   install_fdfind
+  install_rg
   install_fzf
   install_bat
   install_nvitop
