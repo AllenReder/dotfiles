@@ -1,11 +1,12 @@
 @import "../omarchy/current/theme/swayosd.css";
 
 window {
-  border-radius: 0;
-  opacity: 0.97;
-  border: 2px solid @border-color;
-
-  background-color: @background-color;
+  border-radius: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(50, 50, 50, 0.05);
+}
+#container {
+  /* background: red; */
 }
 
 label {
@@ -17,12 +18,70 @@ label {
 
 image {
   color: @image;
+  background: transparent;
+  -gtk-icon-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-progressbar {
-  border-radius: 0;
+progressbar,
+segmentedprogress {
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+progressbar:disabled {
+  border-radius: 10px;
 }
 
 progress {
-  background-color: @progress;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
+/* window#osd { */
+/*   border-radius: 999px; */
+/*   border: none; */
+/*   background: rgba(255,0,0,1); */
+/**/
+/*   #container { */
+/*     margin: 100px; */
+/*   } */
+/**/
+/*   image, */
+/*   label { */
+/*     color: #{"@theme_fg_color"}; */
+/*   } */
+/**/
+/*   progressbar:disabled, */
+/*   image:disabled { */
+/*     opacity: 0.5; */
+/*   } */
+/**/
+/*   progressbar, */
+/*   segmentedprogress { */
+/*     min-height: 6px; */
+/*     border-radius: 999px; */
+/*     background: transparent; */
+/*     border: none; */
+/*   } */
+/*   trough, */
+/*   segment { */
+/*     min-height: inherit; */
+/*     border-radius: inherit; */
+/*     border: none; */
+/*     background: #{"alpha(@theme_fg_color, 0.5)"}; */
+/*   } */
+/*   progress, */
+/*   segment.active { */
+/*     min-height: inherit; */
+/*     border-radius: inherit; */
+/*     border: none; */
+/*     background: #{"@theme_fg_color"}; */
+/*   } */
+/**/
+/*   segment { */
+/*     margin-left: 8px; */
+/*     &:first-child { */
+/*       margin-left: 0; */
+/*     } */
+/*   } */
+/* } */

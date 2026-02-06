@@ -11,7 +11,7 @@
 .box-wrapper {
   background: rgba(50, 50, 50, 0.05);
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
 }
 
