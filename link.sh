@@ -39,6 +39,7 @@ main() {
   link_file "$DOTFILES_DIR/swayosd" "$HOME/.config/swayosd"
   link_file "$DOTFILES_DIR/omarchy" "$HOME/.config/omarchy"
   link_file "$DOTFILES_DIR/walker" "$HOME/.config/walker"
+  link_file "$DOTFILES_DIR/elephant" "$HOME/.config/elephant"
 
   for f in "$DOTFILES_DIR"/bin/*; do
     [ -f "$f" ] || continue

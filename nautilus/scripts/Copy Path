@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Nautilus passes selected paths as newline-separated text and often includes
+# a trailing newline; normalize it to avoid copying an extra line break.
+if [ -n "${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS:-}" ]; then
+  mapfile -t selected_paths <<< "${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS}"
+  text="$(printf '%s\n' "${selected_paths[@]}")"
+  text="${text%$'\n'}"
+else
+  text="${NAUTILUS_SCRIPT_CURRENT_URI:-}"
+  text="${text#file://}"
+  text="${text//%20/ }"
+fi
+
+if command -v wl-copy >/dev/null 2>&1; then
+  printf '%s' "$text" | wl-copy
+elif command -v xclip >/dev/null 2>&1; then
+  printf '%s' "$text" | xclip -selection clipboard
+elif command -v xsel >/dev/null 2>&1; then
+  printf '%s' "$text" | xsel --clipboard --input
+else
+  zenity --error --text='No clipboard tool found (need wl-copy, xclip, or xsel).'
+  exit 1
+fi
+
+command -v notify-send >/dev/null 2>&1 && notify-send 'Copy Path' 'Path copied to clipboard.'
