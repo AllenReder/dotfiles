@@ -1,0 +1,33 @@
+UNIT FILE                             STATE   PRESET
+cups.path                             enabled disabled
+avahi-daemon.service                  enabled disabled
+bluetooth.service                     enabled disabled
+cups-browsed.service                  enabled disabled
+cups.service                          enabled disabled
+docker.service                        enabled disabled
+getty@.service                        enabled enabled
+iwd.service                           enabled disabled
+limine-snapper-sync.service           enabled disabled
+nvidia-hibernate.service              enabled disabled
+nvidia-resume.service                 enabled disabled
+nvidia-suspend-then-hibernate.service enabled disabled
+nvidia-suspend.service                enabled disabled
+sddm.service                          enabled disabled
+systemd-network-generator.service     enabled enabled
+systemd-networkd.service              enabled enabled
+systemd-resolved.service              enabled enabled
+systemd-timesyncd.service             enabled enabled
+ufw.service                           enabled disabled
+avahi-daemon.socket                   enabled disabled
+cups.socket                           enabled disabled
+systemd-networkd-resolve-hook.socket  enabled disabled
+systemd-networkd-varlink.socket       enabled disabled
+systemd-networkd.socket               enabled disabled
+systemd-resolved-monitor.socket       enabled disabled
+systemd-resolved-varlink.socket       enabled disabled
+systemd-userdbd.socket                enabled enabled
+remote-fs.target                      enabled enabled
+snapper-cleanup.timer                 enabled disabled
+snapper-timeline.timer                enabled disabled
+
+30 unit files listed.

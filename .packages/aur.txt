@@ -1,0 +1,5 @@
+ironbar-bin
+linux-wifi-hotspot
+linuxqq
+nvitop
+wechat
