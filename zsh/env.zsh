@@ -10,6 +10,9 @@ if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
 
+if [ -d "$HOME/.fzf/bin" ]; then
+  export PATH="$HOME/.fzf/bin:$PATH"
+fi
 # fzf completion trigger.
 export FZF_COMPLETION_TRIGGER=';;'
 
