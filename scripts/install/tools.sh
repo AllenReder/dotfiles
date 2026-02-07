@@ -22,6 +22,7 @@ source "$SCRIPT_DIR/tools/rg.sh"
 source "$SCRIPT_DIR/tools/fzf.sh"
 source "$SCRIPT_DIR/tools/bat.sh"
 source "$SCRIPT_DIR/tools/nvitop.sh"
+source "$SCRIPT_DIR/tools/yazi.sh"
 
 main() {
   install_zoxide
@@ -31,6 +32,7 @@ main() {
   install_fzf
   install_bat
   install_nvitop
+  install_yazi
 }
 
 main "$@"
