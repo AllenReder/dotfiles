@@ -1,7 +1,12 @@
 # File: env.zsh - Environment variables shared across shells.
 # Environment defaults.
 DOTFILES_DIR="${${(%):-%N}:A:h:h}"
-export PATH="$HOME/.local/share/omarchy/bin:$DOTFILES_DIR/bin:$HOME/.local/bin:$PATH"
+typeset -U path PATH
+path=("$HOME/.local/share/omarchy/bin" "$DOTFILES_DIR/bin" "$HOME/.local/bin" $path)
+# Normalize uv installer legacy PATH entry to avoid duplicates like ~/.local/share/../bin.
+path=(${path:#$HOME/.local/share/../bin})
+path=(${path:#$HOME/.local/share/../bin/})
+export PATH
 export EDITOR="nvim"
 export LANG="zh_CN.UTF-8"
 
