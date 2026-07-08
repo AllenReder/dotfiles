@@ -1,0 +1,18 @@
+# Copy to ~/.config/dotfiles/local.zsh and keep real values out of git.
+
+# Bark push.
+# export BARK_SERVER="https://your-bark-server.example/push"
+# export BARK_DEVICE_KEYS="device_key_1 device_key_2"
+
+# Local agent tools.
+# export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+# export PATH="$HOME/.mavis/bin:$PATH"
+
+# Large-context agent settings.
+# export CLAUDE_CODE_MAX_CONTEXT_TOKENS=272000
+# export CLAUDE_CODE_AUTO_COMPACT_WINDOW=220000
+# export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=80
+
+# Rust mirrors.
+# export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
+# export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup

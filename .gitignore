@@ -1,4 +1,4 @@
 .DS_Store
-dotfiles/
+/dotfiles/
 *.bak
 *.tmp
