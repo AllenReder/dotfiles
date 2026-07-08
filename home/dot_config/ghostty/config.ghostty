@@ -1,9 +1,21 @@
 # Managed Ghostty defaults. Ghostty itself is installed manually.
 
 font-family = JetBrainsMono Nerd Font
-font-size = 14
+font-size = 18
 
-theme = light:Rose Pine Dawn,dark:Rose Pine
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+
+theme = Dark Modern
+window-theme = dark
+macos-titlebar-style = transparent
+macos-option-as-alt = true
+
+background-opacity = 0.85
+background-blur = 20
+
+cursor-style = bar
 
 copy-on-select = clipboard
 clipboard-read = allow

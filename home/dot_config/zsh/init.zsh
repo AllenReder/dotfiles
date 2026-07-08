@@ -11,6 +11,19 @@ ZSH_CONFIG_DIR="${${(%):-%N}:A:h}"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 mkdir -p "$ZSH_CACHE_DIR"
 
+zmodload zsh/complist
+setopt auto_list
+setopt auto_menu
+setopt complete_in_word
+unsetopt menu_complete
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*:descriptions' format ''
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
 autoload -Uz compinit
 compinit -d "$ZSH_CACHE_DIR/zcompdump"
 
