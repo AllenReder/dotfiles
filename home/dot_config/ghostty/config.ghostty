@@ -1,0 +1,12 @@
+# Managed Ghostty defaults. Ghostty itself is installed manually.
+
+font-family = JetBrainsMono Nerd Font
+font-size = 14
+
+theme = light:Rose Pine Dawn,dark:Rose Pine
+
+copy-on-select = clipboard
+clipboard-read = allow
+clipboard-write = allow
+
+shell-integration = zsh

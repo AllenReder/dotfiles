@@ -1,0 +1,16 @@
+git
+curl
+ca-certificates
+zsh
+starship
+tmux
+neovim
+ripgrep
+fd
+fzf
+zoxide
+eza
+bat
+yazi
+jq
+ttf-jetbrains-mono-nerd

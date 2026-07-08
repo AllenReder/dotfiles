@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# =========================================================
+# Bark 推送脚本（多设备 + 多参数 + 环境变量支持）
+# 作者：Allen (优化版)
+# 版本：v1.3
+# =========================================================
+
+# 🚩 配置区（从环境变量读取）
+BARK_SERVER="${BARK_SERVER:-}"    # 你的 Bark 服务地址
+IFS=', ' read -r -a DEVICE_KEYS <<< "${BARK_DEVICE_KEYS:-}"  # 多设备 key（空格或逗号分隔）
+
+# 默认参数
+DEFAULT_SOUND=""
+DEFAULT_GROUP="default"
+DEFAULT_LEVEL="active"
+DEFAULT_ISARCHIVE=1
+
+# =========================================================
+# 🛠 依赖检查
+# =========================================================
+if ! command -v jq &> /dev/null; then
+    echo "❌ 错误: 未找到 'jq' 命令。请先安装 jq (例如: brew install jq / apt install jq)"
+    exit 1
+fi
+
+# =========================================================
+# 🧩 函数定义
+# =========================================================
+
+show_help() {
+  cat <<EOF
+用法：
+  ./bark_push.sh [-t <title>] [-b <body>] [可选参数]
+
+优先顺序：命令行参数 > 环境变量 > 默认值
+
+环境变量支持：
+  export BARK_TITLE="标题"
+  export BARK_BODY="内容"
+
+参数说明：
+  -t, --title          推送标题 (Env: BARK_TITLE)
+  -s, --subtitle       推送副标题
+  -b, --body           推送内容 (Env: BARK_BODY)
+  -u, --url            点击跳转的 URL
+  -g, --group          分组 (默认：${DEFAULT_GROUP})
+  -S, --sound          铃声 (默认：${DEFAULT_SOUND})
+  -l, --level          通知级别：critical | active | timeSensitive | passive
+  -v, --volume         音量 (仅当 level=critical 时有效，0~10)
+  -c, --copy           指定复制的内容
+  -a, --autoCopy       是否自动复制 (传1启用)
+  -i, --icon           自定义图标 URL
+  -A, --archive        是否保存推送 (默认：${DEFAULT_ISARCHIVE})
+  -h, --help           显示帮助
+EOF
+}
+
+# =========================================================
+# 🧾 参数解析
+# =========================================================
+
+# 1. 优先从环境变量初始化，如果环境变量不存在则为空
+#    这样实现了：如果有参数传进来，下面的 while 循环会覆盖这里的值；
+#    如果没有参数，则保留环境变量的值。
+TITLE="${BARK_TITLE:-}"
+BODY="${BARK_BODY:-}"
+
+# 其他变量初始化
+SUBTITLE=""
+URL=""
+GROUP="$DEFAULT_GROUP"
+SOUND="$DEFAULT_SOUND"
+LEVEL="$DEFAULT_LEVEL"
+VOLUME=""
+COPY=""
+AUTOCOPY=""
+ICON=""
+ISARCHIVE="$DEFAULT_ISARCHIVE"
+
+# 2. 解析命令行参数 (优先级最高，会覆盖环境变量)
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -t|--title) TITLE="$2"; shift 2 ;;
+    -s|--subtitle) SUBTITLE="$2"; shift 2 ;;
+    -b|--body) BODY="$2"; shift 2 ;;
+    -u|--url) URL="$2"; shift 2 ;;
+    -g|--group) GROUP="$2"; shift 2 ;;
+    -S|--sound) SOUND="$2"; shift 2 ;;
+    -l|--level) LEVEL="$2"; shift 2 ;;
+    -v|--volume) VOLUME="$2"; shift 2 ;;
+    -c|--copy) COPY="$2"; shift 2 ;;
+    -a|--autoCopy) AUTOCOPY="1"; shift ;;
+    -i|--icon) ICON="$2"; shift 2 ;;
+    -A|--archive) ISARCHIVE="$2"; shift 2 ;;
+    -h|--help) show_help; exit 0 ;;
+    *) echo "未知参数：$1"; show_help; exit 1 ;;
+  esac
+done
+
+#
+# ⭐️⭐️⭐️ 兜底逻辑处理 ⭐️⭐️⭐️
+#
+
+# 检查 BODY 是否为空 (既没有环境变量，也没有命令行参数)
+if [[ -z "$BODY" ]]; then
+  echo "ℹ️ 未检测到推送内容 (Env/Args)，将使用默认通知。"
+  BODY="来自 Bark 的通知。"
+  
+  # 如果 Title 也为空，设置默认 Title
+  if [[ -z "$TITLE" ]]; then
+    TITLE="通知"
+  fi
+fi
+
+# 配置检查
+if [[ -z "$BARK_SERVER" ]]; then
+  echo "❌ 错误: 未设置 BARK_SERVER 环境变量。"
+  exit 1
+fi
+if [[ ${#DEVICE_KEYS[@]} -eq 0 ]]; then
+  echo "❌ 错误: 未设置 BARK_DEVICE_KEYS 环境变量。"
+  exit 1
+fi
+
+# =========================================================
+# 🚀 组装 JSON 请求
+# =========================================================
+
+# 构建 key 数组 JSON
+DEVICE_KEYS_JSON=$(printf '"%s",' "${DEVICE_KEYS[@]}")
+DEVICE_KEYS_JSON="[${DEVICE_KEYS_JSON%,}]"
+
+# 使用 jq 构建 JSON 对象，自动处理转义字符
+JSON_DATA=$(jq -n \
+  --argjson keys "$DEVICE_KEYS_JSON" \
+  --arg title "$TITLE" \
+  --arg subtitle "$SUBTITLE" \
+  --arg body "$BODY" \
+  --arg url "$URL" \
+  --arg group "$GROUP" \
+  --arg sound "$SOUND" \
+  --arg level "$LEVEL" \
+  --arg copy "$COPY" \
+  --arg icon "$ICON" \
+  --argjson isArchive "$ISARCHIVE" \
+  --arg autoCopy "$AUTOCOPY" \
+  --arg volume "$VOLUME" '
+{
+  "device_keys": $keys,
+  "title": $title,
+  "subtitle": $subtitle,
+  "body": $body,
+  "url": $url,
+  "group": $group,
+  "sound": $sound,
+  "level": $level,
+  "copy": $copy,
+  "icon": $icon,
+  "isArchive": $isArchive,
+  "autoCopy": $autoCopy,
+  "volume": ($volume | tonumber? // null)
+} | with_entries(select(.value != "" and .value != null))
+')
+
+# =========================================================
+# 📡 发送请求
+# =========================================================
+
+echo "🚀 正在推送至 Bark Server..."
+# echo "DEBUG Payload: $JSON_DATA" # 调试时可打开
+
+RESPONSE=$(curl -s -X POST "$BARK_SERVER" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d "$JSON_DATA")
+
+if echo "$RESPONSE" | grep -q '"code":200'; then
+  echo "✅ 推送成功！[标题: $TITLE]"
+else
+  echo "❌ 推送失败：$RESPONSE"
+  exit 1
+fi

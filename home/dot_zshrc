@@ -1,0 +1,4 @@
+# Managed by dotfiles. Keep this file small and source real config from XDG.
+if [ -r "$HOME/.config/zsh/init.zsh" ]; then
+  source "$HOME/.config/zsh/init.zsh"
+fi

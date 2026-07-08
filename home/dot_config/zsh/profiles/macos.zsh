@@ -1,0 +1,1 @@
+# macOS desktop profile customizations.

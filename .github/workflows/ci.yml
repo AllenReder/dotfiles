@@ -1,0 +1,47 @@
+name: dotfiles
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install check tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck zsh curl
+          sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Bash syntax
+        run: |
+          bash -n bootstrap.sh scripts/dotfiles/package-install.sh extras/clash.sh home/dot_local/bin/executable_bark
+
+      - name: Zsh syntax
+        run: |
+          zsh -n home/dot_zshrc
+          zsh -n home/dot_config/zsh/*.zsh
+          zsh -n home/dot_config/zsh/os/*.zsh
+          zsh -n home/dot_config/zsh/profiles/*.zsh
+          zsh -n home/dot_config/zsh/host/*.zsh
+
+      - name: ShellCheck
+        run: |
+          shellcheck bootstrap.sh scripts/dotfiles/package-install.sh extras/clash.sh home/dot_local/bin/executable_bark
+
+      - name: Chezmoi dry-run profiles
+        run: |
+          for profile in macos linux-desktop wsl server; do
+            tmp="$(mktemp -d)"
+            mkdir -p "$tmp/.config/dotfiles"
+            {
+              printf 'DOTFILES_PROFILE=%q\n' "$profile"
+              printf 'DOTFILES_FEATURES=%q\n' ""
+            } > "$tmp/.config/dotfiles/profile.env"
+            HOME="$tmp" XDG_CONFIG_HOME="$tmp/.config" XDG_STATE_HOME="$tmp/.local/state" \
+              chezmoi --source "$PWD" --destination "$tmp" apply --dry-run --force
+          done

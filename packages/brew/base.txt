@@ -1,0 +1,17 @@
+chezmoi
+git
+curl
+zsh
+starship
+antidote
+tmux
+neovim
+ripgrep
+fd
+fzf
+zoxide
+eza
+bat
+yazi
+jq
+cask:font-jetbrains-mono-nerd-font

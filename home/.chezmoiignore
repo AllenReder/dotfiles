@@ -1,0 +1,5 @@
+.DS_Store
+
+{{- if ne .chezmoi.os "darwin" }}
+Library/
+{{- end }}
