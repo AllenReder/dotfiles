@@ -11,6 +11,8 @@ theme = Dark Modern
 window-theme = dark
 macos-titlebar-style = transparent
 macos-option-as-alt = true
+confirm-close-surface = false
+quit-after-last-window-closed = false
 
 background-opacity = 0.85
 background-blur = 20
