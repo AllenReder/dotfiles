@@ -56,6 +56,7 @@ DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 - prompt 使用 Starship，配置位于 `~/.config/starship.toml`。
 - Ghostty 配置位于 `~/.config/ghostty/config.ghostty`；macOS 上用 symlink 转发，避免 Application Support 中的配置覆盖 XDG 配置。
 - Ghostty 应用本体不由 bootstrap 安装，需要手动安装。
+- 首次连接缺少 Ghostty terminfo 的服务器时，运行 `ssh-terminfo user@host`；SSH 端口等参数也可照常传入，例如 `ssh-terminfo -p 2222 user@host`。
 
 真实私有变量放在：
 

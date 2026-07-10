@@ -22,3 +22,23 @@ if command -v yazi >/dev/null 2>&1; then
     rm -f -- "$tmp"
   }
 fi
+
+# Install Ghostty's terminfo entry on an SSH server.
+ssh-terminfo() {
+  if (( $# == 0 )); then
+    print -u2 "usage: ssh-terminfo [ssh options] user@host"
+    return 2
+  fi
+
+  if ! command -v infocmp >/dev/null 2>&1; then
+    print -u2 "ssh-terminfo: infocmp is not installed"
+    return 1
+  fi
+
+  if ! command infocmp -x xterm-ghostty >/dev/null 2>&1; then
+    print -u2 "ssh-terminfo: xterm-ghostty is not available locally"
+    return 1
+  fi
+
+  command infocmp -x xterm-ghostty | command ssh "$@" -- tic -x -
+}
