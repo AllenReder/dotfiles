@@ -46,16 +46,7 @@ done
 
 if [ -n "$_antidote_source" ]; then
   source "$_antidote_source"
-  if (( $+functions[antidote] )); then
-    _bundle_file="$ZSH_CONFIG_DIR/plugins.txt"
-    _static_file="$ZSH_CACHE_DIR/antidote.zsh"
-    if [ ! -s "$_static_file" ] || [ "$_bundle_file" -nt "$_static_file" ]; then
-      antidote bundle < "$_bundle_file" >| "$_static_file"
-    fi
-    source "$_static_file"
-  fi
 fi
-unset _antidote_source _candidate _bundle_file _static_file
 
 [ -r "$ZSH_CONFIG_DIR/aliases.zsh" ] && source "$ZSH_CONFIG_DIR/aliases.zsh"
 [ -r "$ZSH_CONFIG_DIR/functions.zsh" ] && source "$ZSH_CONFIG_DIR/functions.zsh"
@@ -99,3 +90,31 @@ fi
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
+
+# zsh-syntax-highlighting must be loaded after every widget and prompt setup.
+# Also rebuild Antidote's static loader when a cache cleanup removed a bundle.
+if (( $+functions[antidote] )); then
+  _bundle_file="$ZSH_CONFIG_DIR/plugins.txt"
+  _static_file="$ZSH_CACHE_DIR/antidote.zsh"
+  _antidote_rebuild=0
+
+  if [ ! -s "$_static_file" ] || [ "$_bundle_file" -nt "$_static_file" ]; then
+    _antidote_rebuild=1
+  else
+    while IFS=$' \t' read -r _bundle _; do
+      case "$_bundle" in
+        ''|'#'*|using:*) continue ;;
+      esac
+      if ! antidote path "$_bundle" >/dev/null 2>&1; then
+        _antidote_rebuild=1
+        break
+      fi
+    done < "$_bundle_file"
+  fi
+
+  if (( _antidote_rebuild )); then
+    antidote bundle < "$_bundle_file" >| "$_static_file"
+  fi
+  source "$_static_file"
+fi
+unset _antidote_source _candidate _bundle_file _static_file _antidote_rebuild _bundle
