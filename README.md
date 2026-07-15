@@ -33,11 +33,12 @@ v1 profile：
 v1 features：
 
 - `gpu`：安装 GPU 相关 CLI，例如 `nvitop`。
+- `node`：统一通过 nvm 安装最新 Node.js LTS；npm 和 npx 随 Node.js 一起安装。
 
 首次运行会把选择写入 `~/.config/dotfiles/profile.env`。之后可以通过环境变量覆盖：
 
 ```bash
-DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
+DOTFILES_PROFILE=server DOTFILES_FEATURES="gpu node" ./bootstrap.sh
 ```
 
 Linux/WSL 默认自动选择包安装后端：有 root 或可用 sudo 时使用系统包管理器，否则使用用户级 micromamba 环境。也可以显式选择：
@@ -87,7 +88,25 @@ DOTFILES_PACKAGE_MODE=system ./bootstrap.sh
 - Debian/Ubuntu：有 root/sudo 时使用 apt；不可用包会跳过并提示。
 - Arch：有 root/sudo 时使用 pacman；AUR 只在已安装 `paru` 时使用。
 - Linux/WSL 无法提权时：安装经过 SHA256 校验的固定版 micromamba，并在 `~/.local/share/dotfiles/env` 中安装 CLI；不安装桌面字体或 Ghostty 应用。
+- 启用 `node` feature 时：所有平台统一安装固定版 nvm，再由 nvm 安装最新 Node.js LTS；即使有 root，也不直接安装发行版的 Node/npm。
 - 关键工具缺失时会用轻量 fallback，例如 Starship/tmh 官方安装脚本、Antidote git clone。
+
+安装或启用 Node/npm：
+
+```bash
+DOTFILES_FEATURES="node" ./bootstrap.sh
+
+# 同时保留 GPU feature
+DOTFILES_FEATURES="gpu node" ./bootstrap.sh
+```
+
+进入新的 zsh 后可以验证：
+
+```bash
+node --version
+npm --version
+npx --version
+```
 
 用户级模式不会修改 `.bashrc`，也不会尝试绕过系统的登录 Shell 策略。安装完成后按提示进入 zsh：
 

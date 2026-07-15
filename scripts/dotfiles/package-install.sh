@@ -10,6 +10,14 @@ warn() { printf '[dotfiles] WARN: %s\n' "$*" >&2; }
 die() { printf '[dotfiles] ERROR: %s\n' "$*" >&2; exit 1; }
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
+if [ "${DOTFILES_FEATURES+x}" = x ]; then
+  DOTFILES_FEATURES_INPUT="$DOTFILES_FEATURES"
+  DOTFILES_FEATURES_INPUT_SET=1
+else
+  DOTFILES_FEATURES_INPUT=""
+  DOTFILES_FEATURES_INPUT_SET=0
+fi
+
 profile_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/profile.env"
 if [ -r "$profile_file" ]; then
   # shellcheck disable=SC1090
@@ -17,18 +25,32 @@ if [ -r "$profile_file" ]; then
 fi
 
 DOTFILES_PROFILE="${DOTFILES_PROFILE:-server}"
-DOTFILES_FEATURES="${DOTFILES_FEATURES:-}"
+if [ "$DOTFILES_FEATURES_INPUT_SET" = 1 ]; then
+  DOTFILES_FEATURES="$DOTFILES_FEATURES_INPUT"
+else
+  DOTFILES_FEATURES="${DOTFILES_FEATURES:-}"
+fi
 DOTFILES_DRY_RUN="${DOTFILES_DRY_RUN:-0}"
 DOTFILES_PACKAGE_BACKEND="${DOTFILES_PACKAGE_BACKEND:-system}"
 DOTFILES_USER_ENV="${DOTFILES_USER_ENV:-${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/env}"
 MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-${XDG_DATA_HOME:-$HOME/.local/share}/mamba}"
 MICROMAMBA_VERSION="2.8.1-0"
+NVM_VERSION="0.40.5"
+NVM_DIR="${NVM_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/nvm}"
 
 is_yes() {
   case "${1:-}" in
     1|y|Y|yes|YES|true|TRUE) return 0 ;;
     *) return 1 ;;
   esac
+}
+
+feature_enabled() {
+  local feature
+  for feature in $DOTFILES_FEATURES; do
+    [ "$feature" = "$1" ] && return 0
+  done
+  return 1
 }
 
 run_as_root() {
@@ -251,6 +273,48 @@ install_micromamba_packages() {
   fi
 }
 
+install_nvm() {
+  local expected_tag="v$NVM_VERSION"
+  if [ -r "$NVM_DIR/nvm.sh" ] && [ "$(git -C "$NVM_DIR" describe --tags --exact-match 2>/dev/null || true)" = "$expected_tag" ]; then
+    return 0
+  fi
+
+  if is_yes "$DOTFILES_DRY_RUN"; then
+    log "DRY RUN: install nvm $expected_tag to $NVM_DIR"
+    return 0
+  fi
+
+  if [ -d "$NVM_DIR/.git" ]; then
+    log "Updating nvm to $expected_tag"
+    git -C "$NVM_DIR" fetch --depth=1 origin "tag" "$expected_tag" || die "failed to fetch nvm $expected_tag"
+    git -C "$NVM_DIR" checkout --detach "$expected_tag" || die "failed to check out nvm $expected_tag"
+  elif [ -e "$NVM_DIR" ]; then
+    die "nvm install directory exists but is not a git checkout: $NVM_DIR"
+  else
+    log "Installing nvm $expected_tag to $NVM_DIR"
+    mkdir -p "$(dirname "$NVM_DIR")"
+    git clone --branch "$expected_tag" --depth=1 https://github.com/nvm-sh/nvm.git "$NVM_DIR" || \
+      die "failed to clone nvm $expected_tag"
+  fi
+}
+
+install_node_feature() {
+  feature_enabled node || return 0
+  install_nvm
+  if is_yes "$DOTFILES_DRY_RUN"; then
+    log "DRY RUN: nvm install --lts"
+    log "DRY RUN: nvm alias default lts/*"
+    return 0
+  fi
+
+  export NVM_DIR
+  # shellcheck disable=SC1090,SC1091
+  . "$NVM_DIR/nvm.sh"
+  log "Installing the latest Node.js LTS via nvm"
+  nvm install --lts || die "nvm failed to install Node.js LTS"
+  nvm alias default 'lts/*' || die "nvm failed to set the default Node.js version"
+}
+
 find_antidote() {
   local paths=(
     "${ANTIDOTE_HOME:-}"
@@ -293,9 +357,9 @@ install_starship_fallback() {
   mkdir -p "$HOME/.local/bin"
   log "Installing Starship to ~/.local/bin"
   if is_yes "$DOTFILES_DRY_RUN"; then
-    log "DRY RUN: curl -sS https://starship.rs/install.sh | sh -s -- -b $HOME/.local/bin -y"
+    log "DRY RUN: curl -sS https://starship.rs/install.sh | POSIXLY_CORRECT=1 sh -s -- -b $HOME/.local/bin -y"
   else
-    curl -sS https://starship.rs/install.sh | sh -s -- -b "$HOME/.local/bin" -y
+    curl -sS https://starship.rs/install.sh | POSIXLY_CORRECT=1 sh -s -- -b "$HOME/.local/bin" -y
   fi
 }
 
@@ -375,6 +439,7 @@ main() {
 
   install_starship_fallback
   install_tmh_fallback
+  install_node_feature
   install_antidote
   install_oh_my_tmux
 }

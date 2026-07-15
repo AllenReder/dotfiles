@@ -89,6 +89,32 @@ test_profile_persistence() {
   rm -rf "$tmp_dir"
 }
 
+test_feature_override() {
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  mkdir -p "$tmp_dir/config/dotfiles"
+  printf 'DOTFILES_FEATURES=gpu\n' > "$tmp_dir/config/dotfiles/profile.env"
+  (
+    export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config"
+    export DOTFILES_FEATURES="gpu node" DOTFILES_BOOTSTRAP_NO_MAIN=1
+    # shellcheck source=../bootstrap.sh
+    source "$REPO_DIR/bootstrap.sh"
+    choose_features
+    assert_eq "$DOTFILES_FEATURES" "gpu node"
+  )
+  (
+    export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config"
+    export DOTFILES_FEATURES=node DOTFILES_PACKAGE_INSTALL_NO_MAIN=1
+    # shellcheck source=../scripts/dotfiles/package-install.sh
+    source "$REPO_DIR/scripts/dotfiles/package-install.sh"
+    feature_enabled node || fail "explicit node feature was overwritten by the saved profile"
+    if feature_enabled gpu; then
+      fail "saved gpu feature overrode the explicit package-script feature"
+    fi
+  )
+  rm -rf "$tmp_dir"
+}
+
 test_micromamba_assets_and_manifest() {
   (
     export DOTFILES_PACKAGE_INSTALL_NO_MAIN=1 XDG_CONFIG_HOME=/nonexistent
@@ -132,7 +158,7 @@ test_micromamba_assets_and_manifest() {
   fi
 
   (
-    export DOTFILES_PACKAGE_INSTALL_NO_MAIN=1 DOTFILES_FEATURES=gpu XDG_CONFIG_HOME=/nonexistent
+    export DOTFILES_PACKAGE_INSTALL_NO_MAIN=1 DOTFILES_FEATURES="gpu node" XDG_CONFIG_HOME=/nonexistent
     # shellcheck source=../scripts/dotfiles/package-install.sh
     source "$REPO_DIR/scripts/dotfiles/package-install.sh"
     packages="$(read_manifest micromamba)"
@@ -140,6 +166,58 @@ test_micromamba_assets_and_manifest() {
     printf '%s\n' "$packages" | grep -qx yazi
     printf '%s\n' "$packages" | grep -qx nvitop
   )
+}
+
+test_nvm_node_feature() {
+  local tmp_dir log_file
+  tmp_dir="$(mktemp -d)"
+  log_file="$tmp_dir/nvm.log"
+  (
+    export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config"
+    export DOTFILES_PACKAGE_INSTALL_NO_MAIN=1 DOTFILES_FEATURES=node
+    export NVM_DIR="$tmp_dir/nvm" TEST_NVM_LOG="$log_file"
+    # shellcheck source=../scripts/dotfiles/package-install.sh
+    source "$REPO_DIR/scripts/dotfiles/package-install.sh"
+    install_nvm() {
+      mkdir -p "$NVM_DIR"
+      cat > "$NVM_DIR/nvm.sh" <<'EOF'
+nvm() {
+  printf '%s\n' "$*" >> "$TEST_NVM_LOG"
+}
+EOF
+    }
+    install_node_feature >/dev/null
+  )
+  grep -qx 'install --lts' "$log_file"
+  grep -qx 'alias default lts/\*' "$log_file"
+  rm -rf "$tmp_dir"
+}
+
+test_starship_posix_shell() {
+  local tmp_dir log_file
+  tmp_dir="$(mktemp -d)"
+  log_file="$tmp_dir/sh.log"
+  (
+    export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config"
+    export DOTFILES_PACKAGE_INSTALL_NO_MAIN=1 TEST_SH_LOG="$log_file"
+    # shellcheck source=../scripts/dotfiles/package-install.sh
+    source "$REPO_DIR/scripts/dotfiles/package-install.sh"
+    have_cmd() {
+      case "$1" in
+        starship) return 1 ;;
+        curl) return 0 ;;
+        *) command -v "$1" >/dev/null 2>&1 ;;
+      esac
+    }
+    curl() { printf 'exit 0\n'; }
+    sh() {
+      printf '%s\n' "${POSIXLY_CORRECT:-}" > "$TEST_SH_LOG"
+      command sh "$@"
+    }
+    install_starship_fallback >/dev/null
+  )
+  grep -qx 1 "$log_file"
+  rm -rf "$tmp_dir"
 }
 
 test_micromamba_download_failures() {
@@ -296,6 +374,10 @@ test_zsh_user_environment_path() {
   chmod +x "$tmp_dir/home/.local/bin/micromamba"
   touch "$user_env/bin/nvitop"
   chmod +x "$user_env/bin/nvitop"
+  mkdir -p "$data_home/nvm"
+  cat > "$data_home/nvm/nvm.sh" <<'EOF'
+export NVM_TEST_INITIALIZED=1
+EOF
   {
     printf 'DOTFILES_PACKAGE_BACKEND=micromamba\n'
     printf 'DOTFILES_USER_ENV=%q\n' "$user_env"
@@ -308,6 +390,7 @@ test_zsh_user_environment_path() {
       source "$DOTFILES_TEST_REPO_DIR/home/dot_config/zsh/aliases.zsh"
       [[ $path[1] == '"$user_env"'/bin ]]
       [[ $MAMBA_ROOT_PREFIX == '"$data_home"'/mamba ]]
+      [[ $NVM_TEST_INITIALIZED == 1 ]]
       [[ "$(alias ntop)" == "ntop=nvitop" ]]
     '
   rm -rf "$tmp_dir"
@@ -315,7 +398,10 @@ test_zsh_user_environment_path() {
 
 test_backend_resolution
 test_profile_persistence
+test_feature_override
 test_micromamba_assets_and_manifest
+test_nvm_node_feature
+test_starship_posix_shell
 test_micromamba_download_failures
 test_micromamba_binary_idempotence
 test_micromamba_environment_idempotence

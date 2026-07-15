@@ -7,6 +7,13 @@ DOTFILES_YES="${DOTFILES_YES:-0}"
 DOTFILES_SKIP_PACKAGES="${DOTFILES_SKIP_PACKAGES:-0}"
 DOTFILES_SKIP_CHSH="${DOTFILES_SKIP_CHSH:-0}"
 DOTFILES_FORCE_BACKUP="${DOTFILES_FORCE_BACKUP:-0}"
+if [ "${DOTFILES_FEATURES+x}" = x ]; then
+  DOTFILES_FEATURES_INPUT="$DOTFILES_FEATURES"
+  DOTFILES_FEATURES_INPUT_SET=1
+else
+  DOTFILES_FEATURES_INPUT=""
+  DOTFILES_FEATURES_INPUT_SET=0
+fi
 DOTFILES_PACKAGE_MODE_INPUT="${DOTFILES_PACKAGE_MODE:-}"
 DOTFILES_USER_ENV_INPUT="${DOTFILES_USER_ENV:-}"
 DOTFILES_PACKAGE_MODE="${DOTFILES_PACKAGE_MODE:-auto}"
@@ -113,9 +120,14 @@ choose_profile() {
 
 choose_features() {
   load_existing_profile
-  local features="${DOTFILES_FEATURES:-}"
-  if [ -t 0 ] && ! is_yes "$DOTFILES_YES" && [ -z "${DOTFILES_FEATURES:-}" ]; then
-    printf '[dotfiles] Optional features, comma or space separated [gpu] (empty): ' >&2
+  local features
+  if is_yes "$DOTFILES_FEATURES_INPUT_SET"; then
+    features="$DOTFILES_FEATURES_INPUT"
+  else
+    features="${DOTFILES_FEATURES:-}"
+  fi
+  if [ -t 0 ] && ! is_yes "$DOTFILES_YES" && ! is_yes "$DOTFILES_FEATURES_INPUT_SET" && [ -z "$features" ]; then
+    printf '[dotfiles] Optional features, comma or space separated [gpu node] (empty): ' >&2
     local reply
     read -r reply || true
     if [ -n "$reply" ]; then

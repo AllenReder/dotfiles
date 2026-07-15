@@ -41,3 +41,8 @@ fi
 if [ "${DOTFILES_PACKAGE_BACKEND:-}" = micromamba ] && [ -d "$DOTFILES_USER_ENV/bin" ]; then
   export PATH="$DOTFILES_USER_ENV/bin:$PATH"
 fi
+
+export NVM_DIR="${NVM_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/nvm}"
+if [ -r "$NVM_DIR/nvm.sh" ]; then
+  source "$NVM_DIR/nvm.sh"
+fi
