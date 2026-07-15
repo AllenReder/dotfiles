@@ -4,7 +4,7 @@ rsync
 ca-certificates
 zsh
 tmux
-neovim
+nvim
 ripgrep
 fd-find
 fzf

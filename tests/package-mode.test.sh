@@ -173,6 +173,10 @@ test_micromamba_assets_and_manifest() {
     printf '%s\n' "$packages" | grep -qx zsh
     printf '%s\n' "$packages" | grep -qx yazi
     printf '%s\n' "$packages" | grep -qx rsync
+    printf '%s\n' "$packages" | grep -qx nvim
+    if printf '%s\n' "$packages" | grep -qx neovim; then
+      fail "micromamba manifest selected the Python neovim client instead of the nvim editor"
+    fi
     printf '%s\n' "$packages" | grep -qx nvitop
   )
 }
