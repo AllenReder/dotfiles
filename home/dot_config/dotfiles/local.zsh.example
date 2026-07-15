@@ -15,12 +15,3 @@
 # export TMH_BASE_URL="https://api.openai.com/v1"
 # export TMH_MODEL="your-model-name"
 # export TMH_API_KEY="your-api-key"
-
-# Large-context agent settings.
-# export CLAUDE_CODE_MAX_CONTEXT_TOKENS=272000
-# export CLAUDE_CODE_AUTO_COMPACT_WINDOW=220000
-# export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=80
-
-# Rust mirrors.
-# export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
-# export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
