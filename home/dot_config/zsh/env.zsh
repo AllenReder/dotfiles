@@ -8,6 +8,9 @@ if [ -r "$HOME/.config/dotfiles/profile.env" ]; then
   source "$HOME/.config/dotfiles/profile.env"
 fi
 
+DOTFILES_USER_ENV="${DOTFILES_USER_ENV:-${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/env}"
+export DOTFILES_USER_ENV
+
 if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
@@ -22,8 +25,8 @@ export UV_EXTRA_INDEX_URL="${UV_EXTRA_INDEX_URL:-https://mirrors.aliyun.com/pypi
 
 if command -v micromamba >/dev/null 2>&1; then
   if [ -z "${MAMBA_ROOT_PREFIX:-}" ]; then
-    if [ -d "$HOME/.local/share/mamba" ]; then
-      export MAMBA_ROOT_PREFIX="$HOME/.local/share/mamba"
+    if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/mamba" ]; then
+      export MAMBA_ROOT_PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/mamba"
     elif [ -d "$HOME/micromamba" ]; then
       export MAMBA_ROOT_PREFIX="$HOME/micromamba"
     elif [ -d "$HOME/.micromamba" ]; then
@@ -33,4 +36,8 @@ if command -v micromamba >/dev/null 2>&1; then
   if [ -n "${MAMBA_ROOT_PREFIX:-}" ] && [ -d "$MAMBA_ROOT_PREFIX/bin" ]; then
     export PATH="$MAMBA_ROOT_PREFIX/bin:$PATH"
   fi
+fi
+
+if [ "${DOTFILES_PACKAGE_BACKEND:-}" = micromamba ] && [ -d "$DOTFILES_USER_ENV/bin" ]; then
+  export PATH="$DOTFILES_USER_ENV/bin:$PATH"
 fi

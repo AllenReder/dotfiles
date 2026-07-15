@@ -1,0 +1,14 @@
+git
+curl
+ca-certificates
+zsh
+tmux
+neovim
+ripgrep
+fd-find
+fzf
+zoxide
+eza
+bat
+yazi
+jq

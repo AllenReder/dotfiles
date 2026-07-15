@@ -40,6 +40,16 @@ v1 features：
 DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 ```
 
+Linux/WSL 默认自动选择包安装后端：有 root 或可用 sudo 时使用系统包管理器，否则使用用户级 micromamba 环境。也可以显式选择：
+
+```bash
+# 强制用户级安装
+DOTFILES_PACKAGE_MODE=user ./bootstrap.sh
+
+# 强制系统包安装；无权限时直接报错
+DOTFILES_PACKAGE_MODE=system ./bootstrap.sh
+```
+
 ## 目录结构
 
 - `.chezmoiroot`：指向 `home/`，让仓库根目录保持干净。
@@ -74,14 +84,24 @@ DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 ## 包安装策略
 
 - macOS：优先 Homebrew；缺 Homebrew 时先提示确认。
-- Debian/Ubuntu：优先 apt；不可用包会跳过并提示。
-- Arch：优先 pacman；AUR 只在已安装 `paru` 时使用。
+- Debian/Ubuntu：有 root/sudo 时使用 apt；不可用包会跳过并提示。
+- Arch：有 root/sudo 时使用 pacman；AUR 只在已安装 `paru` 时使用。
+- Linux/WSL 无法提权时：安装经过 SHA256 校验的固定版 micromamba，并在 `~/.local/share/dotfiles/env` 中安装 CLI；不安装桌面字体或 Ghostty 应用。
 - 关键工具缺失时会用轻量 fallback，例如 Starship/tmh 官方安装脚本、Antidote git clone。
+
+用户级模式不会修改 `.bashrc`，也不会尝试绕过系统的登录 Shell 策略。安装完成后按提示进入 zsh：
+
+```bash
+exec "$HOME/.local/share/dotfiles/env/bin/zsh" -l
+```
+
+用户级模式至少需要系统预装 Git、`curl`/`wget` 之一，以及 `sha256sum`/`shasum` 之一。
 
 ## 验证
 
 ```bash
 bash -n bootstrap.sh scripts/dotfiles/package-install.sh extras/clash.sh home/dot_local/bin/executable_bark
+tests/package-mode.test.sh
 zsh -n home/dot_zshrc home/dot_config/zsh/*.zsh home/dot_config/zsh/os/*.zsh home/dot_config/zsh/profiles/*.zsh home/dot_config/zsh/host/*.zsh
 chezmoi --source "$PWD" apply --dry-run --force
 ```

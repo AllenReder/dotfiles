@@ -7,6 +7,11 @@ DOTFILES_YES="${DOTFILES_YES:-0}"
 DOTFILES_SKIP_PACKAGES="${DOTFILES_SKIP_PACKAGES:-0}"
 DOTFILES_SKIP_CHSH="${DOTFILES_SKIP_CHSH:-0}"
 DOTFILES_FORCE_BACKUP="${DOTFILES_FORCE_BACKUP:-0}"
+DOTFILES_PACKAGE_MODE_INPUT="${DOTFILES_PACKAGE_MODE:-}"
+DOTFILES_USER_ENV_INPUT="${DOTFILES_USER_ENV:-}"
+DOTFILES_PACKAGE_MODE="${DOTFILES_PACKAGE_MODE:-auto}"
+DOTFILES_PACKAGE_BACKEND="${DOTFILES_PACKAGE_BACKEND:-}"
+DOTFILES_USER_ENV="${DOTFILES_USER_ENV:-${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/env}"
 
 log() { printf '[dotfiles] %s\n' "$*"; }
 warn() { printf '[dotfiles] WARN: %s\n' "$*" >&2; }
@@ -122,6 +127,105 @@ choose_features() {
   export DOTFILES_FEATURES
 }
 
+validate_package_mode() {
+  case "$1" in
+    auto|system|user) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+choose_package_mode() {
+  local requested
+  requested="${DOTFILES_PACKAGE_MODE_INPUT:-${DOTFILES_PACKAGE_MODE:-auto}}"
+  validate_package_mode "$requested" || die "invalid DOTFILES_PACKAGE_MODE: $requested (expected auto, system, or user)"
+  DOTFILES_PACKAGE_MODE="$requested"
+  DOTFILES_USER_ENV="${DOTFILES_USER_ENV_INPUT:-${DOTFILES_USER_ENV:-${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/env}}"
+  export DOTFILES_PACKAGE_MODE DOTFILES_USER_ENV
+}
+
+system_package_manager() {
+  case "$(detect_os)" in
+    darwin) have_cmd brew && printf 'brew\n' ;;
+    linux|wsl)
+      if have_cmd apt-get; then
+        printf 'apt\n'
+      elif have_cmd pacman; then
+        printf 'pacman\n'
+      fi
+      ;;
+  esac
+}
+
+can_use_system_packages() {
+  [ "$(id -u)" = "0" ] && return 0
+  have_cmd sudo || return 1
+  sudo -n true >/dev/null 2>&1 && return 0
+  if [ -t 0 ]; then
+    log "Validating sudo access for system packages"
+    sudo -v && return 0
+  fi
+  return 1
+}
+
+resolve_package_backend() {
+  local os mgr
+  os="$(detect_os)"
+
+  if is_yes "$DOTFILES_SKIP_PACKAGES"; then
+    case "$DOTFILES_PACKAGE_MODE" in
+      user) DOTFILES_PACKAGE_BACKEND=micromamba ;;
+      system) DOTFILES_PACKAGE_BACKEND=system ;;
+      auto)
+        case "$DOTFILES_PACKAGE_BACKEND" in
+          system|micromamba) ;;
+          *)
+            if [ -d "$DOTFILES_USER_ENV/conda-meta" ]; then
+              DOTFILES_PACKAGE_BACKEND=micromamba
+            else
+              DOTFILES_PACKAGE_BACKEND=system
+            fi
+            ;;
+        esac
+        ;;
+    esac
+    export DOTFILES_PACKAGE_BACKEND
+    log "Package backend: $DOTFILES_PACKAGE_BACKEND (package installation skipped)"
+    return 0
+  fi
+
+  mgr="$(system_package_manager || true)"
+
+  case "$os:$DOTFILES_PACKAGE_MODE" in
+    darwin:user)
+      die "DOTFILES_PACKAGE_MODE=user is currently supported only on Linux and WSL"
+      ;;
+    darwin:*)
+      DOTFILES_PACKAGE_BACKEND=system
+      ;;
+    linux:user|wsl:user)
+      DOTFILES_PACKAGE_BACKEND=micromamba
+      ;;
+    linux:system|wsl:system)
+      [ -n "$mgr" ] || die "no supported system package manager found"
+      can_use_system_packages || die "DOTFILES_PACKAGE_MODE=system requires root or working sudo access"
+      DOTFILES_PACKAGE_BACKEND=system
+      ;;
+    linux:auto|wsl:auto)
+      if [ -n "$mgr" ] && can_use_system_packages; then
+        DOTFILES_PACKAGE_BACKEND=system
+      else
+        DOTFILES_PACKAGE_BACKEND=micromamba
+      fi
+      ;;
+    *)
+      die "unsupported operating system for package installation: $os"
+      ;;
+  esac
+
+  export DOTFILES_PACKAGE_BACKEND
+  log "Package backend: $DOTFILES_PACKAGE_BACKEND (requested: $DOTFILES_PACKAGE_MODE)"
+}
+
 write_profile_env() {
   local file dir
   file="$(profile_file)"
@@ -130,6 +234,9 @@ write_profile_env() {
   {
     printf 'DOTFILES_PROFILE=%q\n' "$DOTFILES_PROFILE"
     printf 'DOTFILES_FEATURES=%q\n' "$DOTFILES_FEATURES"
+    printf 'DOTFILES_PACKAGE_MODE=%q\n' "$DOTFILES_PACKAGE_MODE"
+    printf 'DOTFILES_PACKAGE_BACKEND=%q\n' "$DOTFILES_PACKAGE_BACKEND"
+    printf 'DOTFILES_USER_ENV=%q\n' "$DOTFILES_USER_ENV"
   } > "$file"
   chmod 600 "$file"
   log "Profile saved: $file"
@@ -163,6 +270,17 @@ ensure_homebrew() {
 }
 
 ensure_bootstrap_tools() {
+  if [ "$DOTFILES_PACKAGE_BACKEND" = micromamba ]; then
+    have_cmd git || die "user package mode requires git to already be installed"
+    if ! have_cmd curl && ! have_cmd wget; then
+      die "user package mode requires curl or wget to already be installed"
+    fi
+    if ! have_cmd sha256sum && ! have_cmd shasum; then
+      die "user package mode requires sha256sum or shasum to verify micromamba"
+    fi
+    return 0
+  fi
+
   local missing=()
   for cmd in git curl; do
     have_cmd "$cmd" || missing+=("$cmd")
@@ -205,7 +323,7 @@ install_chezmoi() {
       fi
       ;;
     linux|wsl)
-      if have_cmd pacman; then
+      if [ "$DOTFILES_PACKAGE_BACKEND" = system ] && have_cmd pacman; then
         log "Installing chezmoi via pacman"
         run_as_root pacman -Sy --needed --noconfirm chezmoi && return 0
       fi
@@ -309,7 +427,21 @@ install_packages() {
   "$source_dir/scripts/dotfiles/package-install.sh"
 }
 
+activate_user_environment() {
+  if [ "$DOTFILES_PACKAGE_BACKEND" = micromamba ] && [ -d "$DOTFILES_USER_ENV/bin" ]; then
+    export PATH="$DOTFILES_USER_ENV/bin:$PATH"
+  fi
+}
+
 maybe_change_shell() {
+  if [ "$DOTFILES_PACKAGE_BACKEND" = micromamba ]; then
+    if [ -x "$DOTFILES_USER_ENV/bin/zsh" ]; then
+      log "User-level zsh installed. Start it with: exec \"$DOTFILES_USER_ENV/bin/zsh\" -l"
+    else
+      warn "user package environment does not contain zsh: $DOTFILES_USER_ENV/bin/zsh"
+    fi
+    return 0
+  fi
   if is_yes "$DOTFILES_SKIP_CHSH"; then
     return 0
   fi
@@ -332,15 +464,18 @@ main() {
   export PATH="$HOME/.local/bin:$PATH"
   choose_profile
   choose_features
+  choose_package_mode
+  resolve_package_backend
   write_profile_env
   ensure_bootstrap_tools
-  install_chezmoi
 
   local source_dir
   source_dir="$(prepare_source_dir)"
   export DOTFILES_SOURCE_DIR="$source_dir"
 
   install_packages "$source_dir"
+  activate_user_environment
+  install_chezmoi
   backup_conflicts "$source_dir"
 
   log "Applying chezmoi source: $source_dir"
@@ -349,4 +484,6 @@ main() {
   log "Done"
 }
 
-main "$@"
+if [ "${DOTFILES_BOOTSTRAP_NO_MAIN:-0}" != "1" ]; then
+  main "$@"
+fi

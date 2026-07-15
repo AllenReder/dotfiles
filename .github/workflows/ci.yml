@@ -19,7 +19,10 @@ jobs:
 
       - name: Bash syntax
         run: |
-          bash -n bootstrap.sh scripts/dotfiles/package-install.sh extras/clash.sh home/dot_local/bin/executable_bark
+          bash -n bootstrap.sh scripts/dotfiles/package-install.sh tests/package-mode.test.sh extras/clash.sh home/dot_local/bin/executable_bark
+
+      - name: Package mode tests
+        run: tests/package-mode.test.sh
 
       - name: Zsh syntax
         run: |
@@ -31,7 +34,7 @@ jobs:
 
       - name: ShellCheck
         run: |
-          shellcheck bootstrap.sh scripts/dotfiles/package-install.sh extras/clash.sh home/dot_local/bin/executable_bark
+          shellcheck bootstrap.sh scripts/dotfiles/package-install.sh tests/package-mode.test.sh extras/clash.sh home/dot_local/bin/executable_bark
 
       - name: Chezmoi dry-run profiles
         run: |
