@@ -35,7 +35,7 @@ v1 features：
 - `gpu`：安装 GPU 相关 CLI，例如 `nvitop`。
 - `node`：统一通过 nvm 安装最新 Node.js LTS；npm 和 npx 随 Node.js 一起安装。
 
-首次运行会把选择写入 `~/.config/dotfiles/profile.env`。之后可以通过环境变量覆盖：
+选择会写入 `~/.config/dotfiles/profile.env`，供已安装的 shell 环境读取；但每次交互运行 `bootstrap.sh` 都会重新询问 features，不会默认复用上一次选择。无人值守运行应显式传入 `DOTFILES_FEATURES`：
 
 ```bash
 DOTFILES_PROFILE=server DOTFILES_FEATURES="gpu node" ./bootstrap.sh

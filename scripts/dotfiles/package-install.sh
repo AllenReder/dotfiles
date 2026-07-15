@@ -239,7 +239,9 @@ install_micromamba() (
   download_file "$base_url/micromamba-$asset.sha256" "$checksum" || die "failed to download micromamba checksum"
   expected="$(awk 'NR == 1 {print $1}' "$checksum")"
   actual="$(sha256_file "$binary")" || die "failed to calculate micromamba checksum"
-  [ -n "$expected" ] && [ "$actual" = "$expected" ] || die "micromamba checksum verification failed"
+  if [ -z "$expected" ] || [ "$actual" != "$expected" ]; then
+    die "micromamba checksum verification failed"
+  fi
   mkdir -p "$HOME/.local/bin"
   cp "$binary" "$target"
   chmod 0755 "$target"

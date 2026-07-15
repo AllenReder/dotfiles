@@ -119,20 +119,17 @@ choose_profile() {
 }
 
 choose_features() {
-  load_existing_profile
   local features
   if is_yes "$DOTFILES_FEATURES_INPUT_SET"; then
     features="$DOTFILES_FEATURES_INPUT"
   else
-    features="${DOTFILES_FEATURES:-}"
+    features=""
   fi
-  if [ -t 0 ] && ! is_yes "$DOTFILES_YES" && ! is_yes "$DOTFILES_FEATURES_INPUT_SET" && [ -z "$features" ]; then
+  if [ -t 0 ] && ! is_yes "$DOTFILES_YES" && ! is_yes "$DOTFILES_FEATURES_INPUT_SET"; then
     printf '[dotfiles] Optional features, comma or space separated [gpu node] (empty): ' >&2
     local reply
     read -r reply || true
-    if [ -n "$reply" ]; then
-      features="$reply"
-    fi
+    features="$reply"
   fi
   features="${features//,/ }"
   DOTFILES_FEATURES="$features"

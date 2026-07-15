@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC1091,SC2030,SC2031,SC2034,SC2329
+# shellcheck disable=SC1091,SC2030,SC2031,SC2034,SC2317,SC2329
 # Tests intentionally source scripts dynamically, isolate state in subshells,
 # and replace selected functions with fakes.
 set -euo pipefail
@@ -101,6 +101,14 @@ test_feature_override() {
     source "$REPO_DIR/bootstrap.sh"
     choose_features
     assert_eq "$DOTFILES_FEATURES" "gpu node"
+  )
+  (
+    export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config" DOTFILES_BOOTSTRAP_NO_MAIN=1
+    unset DOTFILES_FEATURES
+    # shellcheck source=../bootstrap.sh
+    source "$REPO_DIR/bootstrap.sh"
+    choose_features
+    assert_eq "$DOTFILES_FEATURES" ""
   )
   (
     export HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config"
