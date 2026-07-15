@@ -1,0 +1,7 @@
+# Minimal environment for every zsh, including non-interactive SSH commands.
+# Keep this file silent: protocol-driven tools such as rsync and scp also load it.
+_dotfiles_path_config="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/path.zsh"
+if [ -r "$_dotfiles_path_config" ]; then
+  source "$_dotfiles_path_config"
+fi
+unset _dotfiles_path_config

@@ -172,6 +172,7 @@ test_micromamba_assets_and_manifest() {
     packages="$(read_manifest micromamba)"
     printf '%s\n' "$packages" | grep -qx zsh
     printf '%s\n' "$packages" | grep -qx yazi
+    printf '%s\n' "$packages" | grep -qx rsync
     printf '%s\n' "$packages" | grep -qx nvitop
   )
 }
@@ -382,6 +383,8 @@ test_zsh_user_environment_path() {
   chmod +x "$tmp_dir/home/.local/bin/micromamba"
   touch "$user_env/bin/nvitop"
   chmod +x "$user_env/bin/nvitop"
+  touch "$user_env/bin/rsync"
+  chmod +x "$user_env/bin/rsync"
   mkdir -p "$data_home/nvm"
   cat > "$data_home/nvm/nvm.sh" <<'EOF'
 export NVM_TEST_INITIALIZED=1
@@ -390,6 +393,16 @@ EOF
     printf 'DOTFILES_PACKAGE_BACKEND=micromamba\n'
     printf 'DOTFILES_USER_ENV=%q\n' "$user_env"
   } > "$tmp_dir/home/.config/dotfiles/profile.env"
+
+  mkdir -p "$tmp_dir/home/.config/zsh"
+  ln -s "$REPO_DIR/home/dot_zshenv" "$tmp_dir/home/.zshenv"
+  ln -s "$REPO_DIR/home/dot_config/zsh/path.zsh" "$tmp_dir/home/.config/zsh/path.zsh"
+
+  HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/home/.config" XDG_DATA_HOME="$data_home" \
+    zsh -d -c '
+      [[ "$(command -v rsync)" == '"$user_env"'/bin/rsync ]]
+      [[ $path[1] == '"$user_env"'/bin ]]
+    '
 
   HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/home/.config" XDG_DATA_HOME="$data_home" \
     DOTFILES_TEST_REPO_DIR="$REPO_DIR" \

@@ -64,6 +64,7 @@ DOTFILES_PACKAGE_MODE=system ./bootstrap.sh
 - zsh 不再使用 oh-my-zsh 和 powerlevel10k。
 - 插件管理使用 Antidote，bundle 位于 `~/.config/zsh/plugins.txt`。
 - prompt 使用 Starship，配置位于 `~/.config/starship.toml`。
+- `~/.zshenv` 只加载轻量 PATH 配置，使 rsync 等非交互 SSH 命令也能找到 `~/.local/bin` 和 micromamba 用户环境；不会加载 NVM、Starship 或补全。
 - Ghostty 配置位于 `~/.config/ghostty/config.ghostty`；macOS 上用 symlink 转发，避免 Application Support 中的配置覆盖 XDG 配置。
 - Ghostty 应用本体不由 bootstrap 安装，需要手动安装。
 - 首次连接缺少 Ghostty terminfo 的服务器时，运行 `ssh-terminfo user@host`；SSH 端口等参数也可照常传入，例如 `ssh-terminfo -p 2222 user@host`。

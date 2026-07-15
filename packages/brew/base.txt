@@ -1,6 +1,7 @@
 chezmoi
 git
 curl
+rsync
 zsh
 starship
 antidote

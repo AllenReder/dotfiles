@@ -1,15 +1,13 @@
 # Environment shared across macOS, Linux, WSL, and servers.
 
-export PATH="$HOME/.local/bin:$PATH"
+_dotfiles_path_config="${${(%):-%N}:A:h}/path.zsh"
+if [ -r "$_dotfiles_path_config" ]; then
+  source "$_dotfiles_path_config"
+fi
+unset _dotfiles_path_config
+
 export EDITOR="${EDITOR:-nvim}"
 export LANG="${LANG:-zh_CN.UTF-8}"
-
-if [ -r "$HOME/.config/dotfiles/profile.env" ]; then
-  source "$HOME/.config/dotfiles/profile.env"
-fi
-
-DOTFILES_USER_ENV="${DOTFILES_USER_ENV:-${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/env}"
-export DOTFILES_USER_ENV
 
 if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
@@ -36,10 +34,6 @@ if command -v micromamba >/dev/null 2>&1; then
   if [ -n "${MAMBA_ROOT_PREFIX:-}" ] && [ -d "$MAMBA_ROOT_PREFIX/bin" ]; then
     export PATH="$MAMBA_ROOT_PREFIX/bin:$PATH"
   fi
-fi
-
-if [ "${DOTFILES_PACKAGE_BACKEND:-}" = micromamba ] && [ -d "$DOTFILES_USER_ENV/bin" ]; then
-  export PATH="$DOTFILES_USER_ENV/bin:$PATH"
 fi
 
 export NVM_DIR="${NVM_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/nvm}"
