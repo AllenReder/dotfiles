@@ -8,6 +8,9 @@
 # export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 # export PATH="$HOME/.mavis/bin:$PATH"
 
+# Optional clashctl install path (default: $HOME/clashctl).
+# export CLASHCTL_HOME="$HOME/path/to/clashctl"
+
 # Large-context agent settings.
 # export CLAUDE_CODE_MAX_CONTEXT_TOKENS=272000
 # export CLAUDE_CODE_AUTO_COMPACT_WINDOW=220000

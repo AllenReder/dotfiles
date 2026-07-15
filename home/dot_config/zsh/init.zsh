@@ -87,6 +87,19 @@ if [ -r "$HOME/.config/dotfiles/local.zsh" ]; then
   source "$HOME/.config/dotfiles/local.zsh"
 fi
 
+# clash-for-linux-install exposes its commands as shell functions instead of
+# standalone executables. Load them after local.zsh so custom install paths can
+# override the default ~/clashctl location.
+if [ "$(uname -s)" = Linux ]; then
+  _clashctl_home="${CLASHCTL_HOME:-$HOME/clashctl}"
+  _clashctl_init="$_clashctl_home/scripts/cmd/clashctl.sh"
+  if [ -r "$_clashctl_init" ]; then
+    export CLASHCTL_HOME="$_clashctl_home"
+    source "$_clashctl_init"
+  fi
+  unset _clashctl_home _clashctl_init
+fi
+
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi

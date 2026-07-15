@@ -57,6 +57,7 @@ DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 - Ghostty 配置位于 `~/.config/ghostty/config.ghostty`；macOS 上用 symlink 转发，避免 Application Support 中的配置覆盖 XDG 配置。
 - Ghostty 应用本体不由 bootstrap 安装，需要手动安装。
 - 首次连接缺少 Ghostty terminfo 的服务器时，运行 `ssh-terminfo user@host`；SSH 端口等参数也可照常传入，例如 `ssh-terminfo -p 2222 user@host`。
+- Linux/WSL 检测到 `~/clashctl/scripts/cmd/clashctl.sh` 时，会自动加载 `clashctl`、`clashon`、`clashoff`、`clashtun` 等命令；自定义安装路径可在 `local.zsh` 中设置 `CLASHCTL_HOME`。
 
 真实私有变量放在：
 
