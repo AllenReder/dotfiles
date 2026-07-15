@@ -58,6 +58,7 @@ DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 - Ghostty 应用本体不由 bootstrap 安装，需要手动安装。
 - 首次连接缺少 Ghostty terminfo 的服务器时，运行 `ssh-terminfo user@host`；SSH 端口等参数也可照常传入，例如 `ssh-terminfo -p 2222 user@host`。
 - Linux/WSL 检测到 `~/clashctl/scripts/cmd/clashctl.sh` 时，会自动加载 `clashctl`、`clashon`、`clashoff`、`clashtun` 等命令；自定义安装路径可在 `local.zsh` 中设置 `CLASHCTL_HOME`。
+- 缺少 `tmh` 时会通过项目官方安装脚本安装到 `~/.local/bin`；Zsh 集成由 dotfiles 加载，使生成的命令进入输入缓冲区等待确认。
 
 真实私有变量放在：
 
@@ -76,7 +77,7 @@ DOTFILES_PROFILE=server DOTFILES_FEATURES="" ./bootstrap.sh
 - macOS：优先 Homebrew；缺 Homebrew 时先提示确认。
 - Debian/Ubuntu：优先 apt；不可用包会跳过并提示。
 - Arch：优先 pacman；AUR 只在已安装 `paru` 时使用。
-- 关键工具缺失时会用轻量 fallback，例如 Starship 官方安装脚本、Antidote git clone。
+- 关键工具缺失时会用轻量 fallback，例如 Starship/tmh 官方安装脚本、Antidote git clone。
 
 ## 验证
 

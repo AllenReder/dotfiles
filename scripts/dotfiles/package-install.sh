@@ -205,6 +205,26 @@ install_starship_fallback() {
   fi
 }
 
+install_tmh_fallback() {
+  if have_cmd tmh && have_cmd tmha; then
+    return 0
+  fi
+  have_cmd curl || {
+    warn "curl not found; cannot install tmh fallback"
+    return 0
+  }
+  have_cmd tar || {
+    warn "tar not found; cannot install tmh fallback"
+    return 0
+  }
+  log "Installing tmh to ~/.local/bin"
+  if is_yes "$DOTFILES_DRY_RUN"; then
+    log "DRY RUN: curl -fsSL https://raw.githubusercontent.com/AllenReder/tmh/main/install.sh | TMH_INSTALL_ZSH=0 sh"
+  else
+    curl -fsSL https://raw.githubusercontent.com/AllenReder/tmh/main/install.sh | TMH_INSTALL_ZSH=0 sh
+  fi
+}
+
 install_oh_my_tmux() {
   have_cmd git || return 0
   if [ ! -d "$HOME/.tmux/.git" ]; then
@@ -247,6 +267,7 @@ main() {
   esac
 
   install_starship_fallback
+  install_tmh_fallback
   install_antidote
   install_oh_my_tmux
 }

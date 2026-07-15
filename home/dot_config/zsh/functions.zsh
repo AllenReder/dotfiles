@@ -8,6 +8,12 @@ if command -v fzf >/dev/null 2>&1; then
   source <(fzf --zsh)
 fi
 
+_tmh_shell="${XDG_DATA_HOME:-$HOME/.local/share}/tmh/shell/tmh.zsh"
+if [ -x "$HOME/.local/bin/tmh" ] && [ -r "$_tmh_shell" ]; then
+  source "$_tmh_shell"
+fi
+unset _tmh_shell
+
 if command -v yazi >/dev/null 2>&1; then
   y() {
     local tmp cwd

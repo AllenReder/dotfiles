@@ -11,6 +11,11 @@
 # Optional clashctl install path (default: $HOME/clashctl).
 # export CLASHCTL_HOME="$HOME/path/to/clashctl"
 
+# tmh model endpoint. Keep the real API key and private endpoint local.
+# export TMH_BASE_URL="https://api.openai.com/v1"
+# export TMH_MODEL="your-model-name"
+# export TMH_API_KEY="your-api-key"
+
 # Large-context agent settings.
 # export CLAUDE_CODE_MAX_CONTEXT_TOKENS=272000
 # export CLAUDE_CODE_AUTO_COMPACT_WINDOW=220000
