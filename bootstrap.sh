@@ -110,7 +110,7 @@ choose_features() {
   load_existing_profile
   local features="${DOTFILES_FEATURES:-}"
   if [ -t 0 ] && ! is_yes "$DOTFILES_YES" && [ -z "${DOTFILES_FEATURES:-}" ]; then
-    printf '[dotfiles] Optional features, comma or space separated [gpu ai-local] (empty): ' >&2
+    printf '[dotfiles] Optional features, comma or space separated [gpu] (empty): ' >&2
     local reply
     read -r reply || true
     if [ -n "$reply" ]; then

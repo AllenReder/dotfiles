@@ -11,7 +11,7 @@ curl -fsSL https://raw.githubusercontent.com/AllenReder/dotfiles/main/bootstrap.
 无人值守示例：
 
 ```bash
-DOTFILES_PROFILE=macos DOTFILES_FEATURES="ai-local" DOTFILES_YES=1 \
+DOTFILES_PROFILE=macos DOTFILES_FEATURES="" DOTFILES_YES=1 \
   bash <(curl -fsSL https://raw.githubusercontent.com/AllenReder/dotfiles/main/bootstrap.sh)
 ```
 
@@ -33,7 +33,6 @@ v1 profile：
 v1 features：
 
 - `gpu`：安装 GPU 相关 CLI，例如 `nvitop`。
-- `ai-local`：只提供本地私有环境变量入口，不把真实值提交到 git。
 
 首次运行会把选择写入 `~/.config/dotfiles/profile.env`。之后可以通过环境变量覆盖：
 
