@@ -4,10 +4,6 @@
 # export BARK_SERVER="https://your-bark-server.example/push"
 # export BARK_DEVICE_KEYS="device_key_1 device_key_2"
 
-# Local agent tools.
-# export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
-# export PATH="$HOME/.mavis/bin:$PATH"
-
 # Optional clashctl install path (default: $HOME/clashctl).
 # export CLASHCTL_HOME="$HOME/path/to/clashctl"
 
