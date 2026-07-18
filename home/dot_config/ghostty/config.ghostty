@@ -9,6 +9,8 @@ window-padding-balance = true
 
 theme = Dark Modern
 window-theme = dark
+selection-background = #505154
+selection-foreground = #ffffff
 macos-titlebar-style = transparent
 macos-option-as-alt = true
 confirm-close-surface = false
