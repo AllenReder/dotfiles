@@ -1,5 +1,34 @@
-# Neovim
+# AstroNvim Template
 
-这个目录由 dotfiles/chezmoi 管理，最终部署到 `~/.config/nvim`。
+**NOTE:** This is for AstroNvim v6+
 
-当前配置基于 AstroNvim v5，插件版本由 `lazy-lock.json` 固定。不要直接按 AstroNvim 模板说明把仓库克隆到 `~/.config/nvim`；请通过根目录 `bootstrap.sh` 或 `chezmoi apply` 更新。
+A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
+
+## 🛠️ Installation
+
+#### Make a backup of your current nvim and shared folder
+
+```shell
+mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.local/share/nvim ~/.local/share/nvim.bak
+mv ~/.local/state/nvim ~/.local/state/nvim.bak
+mv ~/.cache/nvim ~/.cache/nvim.bak
+```
+
+#### Create a new user repository from this template
+
+Press the "Use this template" button above to create a new repository to store your user configuration.
+
+You can also just clone this repository directly if you do not want to track your user configuration in GitHub.
+
+#### Clone the repository
+
+```shell
+git clone https://github.com/<your_user>/<your_repository> ~/.config/nvim
+```
+
+#### Start Neovim
+
+```shell
+nvim
+```
