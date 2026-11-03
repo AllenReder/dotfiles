@@ -83,6 +83,13 @@ DOTFILES_PACKAGE_MODE=system ./bootstrap.sh
 ~/.config/dotfiles/local.zsh.example
 ```
 
+## Neovim
+
+- 配置源在 `home/dot_config/nvim`（AstroNvim v6，模板基线 `AstroNvim/template@49a7161`）。
+- 只修改源目录，然后同步到本机：`chezmoi --source ~/dotfiles apply --force ~/.config/nvim`。
+- 在 nvim 中执行 `:Lazy update` 后，把 `~/.config/nvim/lazy-lock.json` 复制回源目录再提交。
+- 同步上游模板时，把 `AstroNvim/template` clone 到临时目录做 diff；不要把上游 `.git` 放进仓库。
+
 ## 包安装策略
 
 - macOS：优先 Homebrew；缺 Homebrew 时先提示确认。
